@@ -1,5 +1,4 @@
 name = "telegram-bot"
-main = "dist/src/index.js"
 main = "src/index.ts"
 compatibility_date = "2023-12-01"
 
@@ -9,9 +8,3 @@ type = "module"
 
 [vars]
 TELEGRAM_BOT_TOKEN = "d8e8fca2dc0f896fd7cb4cb0031ba249"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "family_menu_db"
-database_id = "d0071e20-f487-48fc-a5f4-150057995d48"
-preview_database_id = "58eb1450-31a2-43c4-a342-36abd4ba1f47"

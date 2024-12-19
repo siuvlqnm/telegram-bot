@@ -75,7 +75,7 @@ async function sendMessage(chat_id: number, text: string, botToken: string) {
 }
 
 // 处理 Telegram Webhook
-app.post('/telegram', async (c) => {
+app.post('/', async (c) => {
    try {
       const body = await c.req.json();
       const update = telegramUpdateSchema.safeParse(body);

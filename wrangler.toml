@@ -6,8 +6,8 @@ compatibility_date = "2023-12-01"
 mode = "smart"
 type = "module"
 
-# [vars]
-# TELEGRAM_BOT_TOKEN = "d8e8fca2dc0f896fd7cb4cb0031ba249"
+[vars]
+TELEGRAM_BOT_TOKEN = "7564589622:AAG_zBFq13ddWqU1btFStKNE38tZhFtxGTY"
 
 [[kv_namespaces]]
 id = "e24d480067f14571b4a1dbe1837073be"

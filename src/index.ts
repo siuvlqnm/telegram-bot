@@ -50,7 +50,7 @@ async function sendMessage(chat_id: number, text: string, botToken: string) {
       console.error('Telegram Bot token not found in environment variables.');
       return;
    }
-   console.log('sendMessage:', chat_id, text, botToken);
+   
    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
    const payload = {
       chat_id,
@@ -65,12 +65,11 @@ async function sendMessage(chat_id: number, text: string, botToken: string) {
          },
          body: JSON.stringify(payload),
       });
-      console.log('response:', response);
+
       if (!response.ok) {
          console.error(`Failed to send message to chat ${chat_id}: ${response.status} - ${response.statusText}`);
       }
    } catch (error) {
-      console.log('error:', error);
       console.error(`Error sending message to chat ${chat_id}:`, error);
    }
 }
@@ -79,18 +78,15 @@ async function sendMessage(chat_id: number, text: string, botToken: string) {
 app.post('/', async (c) => {
    try {
       const body = await c.req.json();
-      console.log('body:', body);
       const update = telegramUpdateSchema.safeParse(body);
-      console.log('update:', update);
+
       if (!update.success) {
          console.error('Invalid Telegram Update:', update.error);
          return c.json({ message: 'Invalid Telegram Update' }, 400);
       }
       const message = update.data.message;
-      console.log('message:', message);
       if (message?.text) {
           const chatId = message.chat.id;
-          console.log('chatId:', chatId);
           if (message.text === '/start') {
               await sendMessage(chatId, "你好，我是你的 Hono Bot！", c.env.TELEGRAM_BOT_TOKEN)
           }
@@ -98,7 +94,7 @@ app.post('/', async (c) => {
               await sendMessage(chatId, `你发送了: ${message.text}`, c.env.TELEGRAM_BOT_TOKEN)
           }
       }
-      console.log('message.text:', message?.text);
+
 
       return c.json({ message: 'OK' }, 200);
    } catch (error) {

@@ -1,100 +1,54 @@
 import { Hono } from 'hono';
-import { z } from 'zod';
 import { cors } from 'hono/cors';
-import { Bindings } from './bindings';
+import { zValidator } from '@hono/zod-validator';
+import { Bindings } from '@/bindings';
+import { getUserState, setUserState } from '@/contexts/user-states';
+import { telegramUpdateSchema } from '@/middlewares/validation';
+import { handleStart } from '@/handlers/start';
+import { handleTextMessage } from '@/handlers/message';
 
 const app = new Hono<{ Bindings: Bindings }>();
-
-// 开启跨域资源共享（CORS）
 app.use('/*', cors());
+// app.use('/', validateTelegramUpdate);
 
-// 定义 Telegram Update 的数据结构
-const telegramUpdateSchema = z.object({
-   update_id: z.number(),
-   message: z
-      .object({
-         message_id: z.number(),
-         from: z.object({
-            id: z.number(),
-            is_bot: z.boolean(),
-            first_name: z.string(),
-            last_name: z.string().optional(),
-            username: z.string().optional(),
-            language_code: z.string().optional(),
-         }),
-         chat: z.object({
-            id: z.number(),
-            first_name: z.string(),
-            last_name: z.string().optional(),
-            username: z.string().optional(),
-            type: z.string(),
-         }),
-         date: z.number(),
-         text: z.string().optional(),
-         entities: z
-            .array(
-               z.object({
-                  offset: z.number(),
-                  length: z.number(),
-                  type: z.string(),
-               }),
-            )
-            .optional(),
-      })
-      .optional(),
-});
+app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
+    try {
+      const update = c.req.valid('json')
+      const message = update.message;
 
-// 定义发送消息的函数
-async function sendMessage(chat_id: number, text: string, botToken: string) {
-   if (!botToken) {
-      console.error('Telegram Bot token not found in environment variables.');
-      return;
-   }
-   
-   const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-   const payload = {
-      chat_id,
-      text,
-   };
-
-   try {
-      const response = await fetch(url, {
-         method: 'POST',
-         headers: {
-            'Content-Type': 'application/json',
-         },
-         body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-         console.error(`Failed to send message to chat ${chat_id}: ${response.status} - ${response.statusText}`);
+      if (!message) {
+            return c.json({ message: 'Invalid Telegram Update' }, 400);
       }
-   } catch (error) {
-      console.error(`Error sending message to chat ${chat_id}:`, error);
-   }
-}
-
-// 处理 Telegram Webhook
-app.post('/', async (c) => {
-   try {
-      const body = await c.req.json();
-      const update = telegramUpdateSchema.safeParse(body);
-
-      if (!update.success) {
-         console.error('Invalid Telegram Update:', update.error);
-         return c.json({ message: 'Invalid Telegram Update' }, 400);
-      }
-      const message = update.data.message;
       if (message?.text) {
-          const chatId = message.chat.id;
-          if (message.text === '/start') {
-              await sendMessage(chatId, "你好，我是你的 Hono Bot！", c.env.TELEGRAM_BOT_TOKEN)
-          }
-          else {
-              await sendMessage(chatId, `你发送了: ${message.text}`, c.env.TELEGRAM_BOT_TOKEN)
-          }
-      }
+            const chatId = message.chat.id;
+            const userId = message.from.id;
+            const text = message.text;
+            const kv = c.env.TELEGRAM_BOT_KV;
 
+            // **获取用户当前状态**
+            const currentState = await getUserState(kv, userId);
+
+            if (text === '/start') {
+               await setUserState(kv, userId, 'IDLE'); // 重置状态为 idle
+               await handleStart(chatId);
+            } else if (text === '/calc') {
+               await setUserState(kv, userId, 'CALC');
+               await handleTextMessage(message);
+            } else if (text === '/cancel') {
+               await setUserState(kv, userId, 'IDLE');
+               await handleTextMessage(message);
+            } else {
+               // **根据当前状态处理用户消息**
+               if (currentState === 'CALC') {
+                  // 在 AI 模式下处理用户输入
+                  await handleTextMessage(message);
+                  // TODO: 调用 AI 服务处理用户输入
+               } else {
+                  // 默认情况下处理用户输入
+                  await handleTextMessage(message);
+               }
+            }
+      }
 
       return c.json({ message: 'OK' }, 200);
    } catch (error) {
@@ -102,6 +56,5 @@ app.post('/', async (c) => {
       return c.json({ message: 'Error processing update' }, 500);
    }
 });
-
 
 export default app;

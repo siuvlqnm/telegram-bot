@@ -1,0 +1,17 @@
+name = "telegram-bot"
+main = "src/index.ts"
+compatibility_date = "2023-12-01"
+
+[placement]
+mode = "smart"
+type = "module"
+
+[vars]
+TELEGRAM_BOT_TOKEN = "d8e8fca2dc0f896fd7cb4cb0031ba249"
+
+[[kv_namespaces]]
+id = "e24d480067f14571b4a1dbe1837073be"
+binding = "TELEGRAM_BOT_KV"
+
+[observability.logs]
+enabled = true

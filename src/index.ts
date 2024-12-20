@@ -15,6 +15,9 @@ app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
    initializeConfig(c.env);
    try {
       const update = c.req.valid('json')
+
+      console.log(c.req.json());
+      
       const message = update.message;
 
       if (!message) {

@@ -1,4 +1,3 @@
-import {  MiddlewareHandler } from 'hono';
 import { z } from 'zod';
 
 export const telegramUpdateSchema = z.object({

@@ -7,7 +7,7 @@ export async function sendMessage(chat_id: number, text: string, reply_markup?: 
       console.error('Telegram Bot token not found in environment variables.');
       return;
   }
-
+  console.log('text:', text);
   const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
   const payload = {
     chat_id,

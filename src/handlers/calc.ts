@@ -39,13 +39,13 @@ function calculate(expression: string): number | string {
 }
 
  export async function handleCalcCommand(chatId: number, text: string) {
-     const [_, ...expressionArray] = text.split(' ');
-     if(!expressionArray.length) {
-         await sendMessage(chatId, "请提供一个要计算的算式");
-         return;
-     }
-     const expression = expressionArray.join(' ');
+   //   const [_, ...expressionArray] = text.split(' ');
+   //   if(!expressionArray.length) {
+   //       await sendMessage(chatId, "请提供一个要计算的算式");
+   //       return;
+   //   }
+   //   const expression = expressionArray.join(' ');
 
-     const result = calculate(expression);
+     const result = calculate(text);
      await sendMessage(chatId, `结果是: ${result}`);
  }

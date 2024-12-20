@@ -2,7 +2,7 @@ import {  MiddlewareHandler } from 'hono';
 import { z } from 'zod';
 
 export const telegramUpdateSchema = z.object({
-   //  update_id: z.number(),
+    update_id: z.number(),
     message: z
        .object({
           message_id: z.number(),

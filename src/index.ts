@@ -15,14 +15,12 @@ app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
    initializeConfig(c.env);
    try {
       const update = c.req.valid('json')
-      // console.log(update);
       const message = update.message;
 
       if (!message) {
             return c.json({ message: 'Invalid Telegram Update' }, 400);
       }
       if (message?.text) {
-         console.log('message.text:', message.text);
          const chatId = message.chat.id;
          const userId = message.from.id;
          const text = message.text;
@@ -30,7 +28,6 @@ app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
 
          // **获取用户当前状态**
          const currentState = await getUserState(kv, userId);
-         console.log('text:', text);
          if (text === '/start' || text === '/cancel') {
             await setUserState(kv, userId, 'IDLE'); // 重置状态为 idle
             await handleStart(chatId);

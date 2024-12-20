@@ -6,13 +6,14 @@ import { getUserState, setUserState } from '@/contexts/user-states';
 import { telegramUpdateSchema } from '@/middlewares/validation';
 import { handleStart } from '@/handlers/start';
 import { handleTextMessage } from '@/handlers/message';
+import { initializeConfig } from '@/config';
 
 const app = new Hono<{ Bindings: Bindings }>();
 app.use('/*', cors());
-// app.use('/', validateTelegramUpdate);
 
 app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
-    try {
+   initializeConfig(c.env);
+   try {
       const update = c.req.valid('json')
       const message = update.message;
 
@@ -28,14 +29,11 @@ app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
             // **获取用户当前状态**
             const currentState = await getUserState(kv, userId);
 
-            if (text === '/start') {
+            if (text === '/start' || text === '/cancel') {
                await setUserState(kv, userId, 'IDLE'); // 重置状态为 idle
                await handleStart(chatId);
             } else if (text === '/calc') {
                await setUserState(kv, userId, 'CALC');
-               await handleTextMessage(message);
-            } else if (text === '/cancel') {
-               await setUserState(kv, userId, 'IDLE');
                await handleTextMessage(message);
             } else {
                // **根据当前状态处理用户消息**

@@ -11,7 +11,7 @@ export async function getAiResponse(messages: any[]) {
       }
     });
     const completion = await openai.chat.completions.create({
-       model: 'google/gemini-2.0-flash-thinking-exp:free',
+       model: 'google/gemini-2.0-flash-exp:free',
        messages: messages,
     });
     return completion.choices[0].message.content;

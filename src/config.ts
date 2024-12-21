@@ -14,4 +14,5 @@ export function getConfig() {
 }
 
 export const TELEGRAM_BOT_TOKEN = () => getConfig().TELEGRAM_BOT_TOKEN;
+export const OPENROUTER_API_KEY = () => getConfig().OPENROUTER_API_KEY;
 // 可以根据需要添加其他配置项的访问函数

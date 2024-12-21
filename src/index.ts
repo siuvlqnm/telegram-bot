@@ -34,12 +34,15 @@ app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
          } else if (text === '/calc') {
             await setUserState(kv, userId, 'CALC');
             await handleTextMessage(message, 'CALC');
+         } else if (text === '/ai') {
+            await setUserState(kv, userId, 'AI');
+            await handleTextMessage(message, 'AI');
          } else {
             // **根据当前状态处理用户消息**
             if (currentState === 'CALC') {
-               // 在 AI 模式下处理用户输入
                await handleTextMessage(message, 'CALC');
-               // TODO: 调用 AI 服务处理用户输入
+            } else if (currentState === 'AI') {
+               await handleTextMessage(message, 'AI');
             } else {
                // 默认情况下处理用户输入
                await handleStart(chatId);

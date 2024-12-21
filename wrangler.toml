@@ -7,7 +7,7 @@ mode = "smart"
 type = "module"
 
 [vars]
-TELEGRAM_BOT_TOKEN = "d8e8fca2dc0f896fd7cb4cb0031ba249"
+TELEGRAM_BOT_TOKEN = ""
 OPENROUTER_API_KEY = ""
 
 [[kv_namespaces]]

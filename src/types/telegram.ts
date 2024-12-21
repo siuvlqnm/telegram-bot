@@ -30,7 +30,23 @@ export interface TelegramUser {
     entities?: TelegramEntity[]; // 消息实体
  }
  
- export interface TelegramUpdate {
-    update_id: number; // 更新ID
-    message?: TelegramMessage; // 消息
- }
+ export type TelegramCallbackQuery = {
+    id: string;
+    from: {
+        id: number;
+        is_bot: boolean;
+        first_name: string;
+        last_name?: string;
+        username?: string;
+        language_code?: string;
+    };
+    message: TelegramMessage;
+    data: string;  // 包含回调数据，例如 "/select_模型ID"
+    chat_instance: string;
+};
+ 
+export type TelegramUpdate = {
+   update_id: number; // 更新ID
+   message?: TelegramMessage;
+   callback_query?: TelegramCallbackQuery;
+};

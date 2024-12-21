@@ -7,6 +7,7 @@ import { telegramUpdateSchema } from '@/middlewares/validation';
 import { handleStart } from '@/handlers/start';
 import { handleTextMessage } from '@/handlers/message';
 import { initializeConfig } from '@/config';
+import { handleCallbackQuery } from '@/handlers/callback';
 
 const app = new Hono<{ Bindings: Bindings }>();
 app.use('/*', cors());
@@ -14,11 +15,17 @@ app.use('/*', cors());
 app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
    initializeConfig(c.env);
    try {
-      const update = c.req.valid('json')
+      const update = c.req.valid('json');
       const message = update.message;
+      const callback_query = update.callback_query;
+
+      if (callback_query) {
+         await handleCallbackQuery(callback_query, c.env.TELEGRAM_BOT_KV);
+         return c.json({ message: 'OK' }, 200);
+      }
 
       if (!message) {
-            return c.json({ message: 'Invalid Telegram Update' }, 400);
+         return c.json({ message: 'Invalid Telegram Update' }, 400);
       }
       if (message?.text) {
          const chatId = message.chat.id;

@@ -37,6 +37,9 @@ app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
          } else if (text === '/ai') {
             await setUserState(kv, userId, 'AI');
             await handleTextMessage(message, 'AI');
+         } else if (text === '/model') {
+            await setUserState(kv, userId, 'IDLE');
+            await handleTextMessage(message, 'IDLE');
          } else {
             // **根据当前状态处理用户消息**
             if (currentState === 'CALC') {

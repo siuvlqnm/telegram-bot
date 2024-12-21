@@ -2,6 +2,8 @@ import { TelegramMessage } from "@/types/telegram";
 import { handleCalcCommand } from "@/handlers/calc";
 import { sendMessage } from '@/utils/telegram';
 import { handleAiMessage } from "@/handlers/ai";
+import { showModelSelection } from "@/handlers/model";
+
 export async function handleTextMessage(message: TelegramMessage, currentState: string) {
    const chatId = message.chat.id;
    const text = message.text;
@@ -15,6 +17,10 @@ export async function handleTextMessage(message: TelegramMessage, currentState: 
    }
    if (text.startsWith("/ai")) {
       await sendMessage(chatId, "请输入要问的问题");
+      return;
+   }
+   if (text.startsWith("/model")) {
+      await showModelSelection(chatId);
       return;
    }
 

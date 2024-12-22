@@ -1,4 +1,5 @@
-import { BaseAIService, AIServiceConfig } from './base';
+import { BaseAIService } from '@/services/ai/base';
+import { GoogleAIService } from '@/services/ai/google';
 import { getModelByUniqueId, getProviderById } from '@/types/ai';
 import { OPENROUTER_API_KEY, DEEPSEEK_API_KEY, GOOGLE_API_KEY } from '@/config';
 
@@ -36,7 +37,17 @@ export class AIServiceFactory {
             throw new Error(`API key not configured for provider: ${model.providerId}`);
         }
 
-        // 创建并返回服务实例
+        // 为 Google AI 创建专门的服务实例
+        if (model.providerId === 'google') {
+            return new GoogleAIService({
+                apiKey,
+                baseURL: provider.baseURL,
+                defaultHeaders: provider.defaultHeaders,
+                modelId: model.modelId
+            });
+        }
+
+        // 其他服务使用基础实现
         return new BaseAIService({
             apiKey,
             baseURL: provider.baseURL,

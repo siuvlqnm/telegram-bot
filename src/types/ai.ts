@@ -27,15 +27,6 @@ export const AI_PROVIDERS: Record<string, AIProvider> = {
             'X-Title': 'Telegram Bot'
         }
     },
-    'anthropic': {
-        id: 'anthropic',
-        name: 'Anthropic',
-        description: 'Claude 系列模型',
-        baseURL: 'https://api.anthropic.com/v1',
-        defaultHeaders: {
-            'anthropic-version': '2023-06-01'
-        }
-    },
     'deepseek': {
         id: 'deepseek',
         name: 'DeepSeek',
@@ -76,8 +67,8 @@ export const AI_MODELS: AIModel[] = [
     },
     {
         providerId: 'deepseek',
-        modelId: 'deepseek-chat:free',
-        uniqueId: 'deepseek:deepseek-chat:free',
+        modelId: 'deepseek-chat',
+        uniqueId: 'deepseek:deepseek-chat',
         name: 'DeepSeek Chat',
         description: '深度求索（DeepSeek）公司开发的 AI 模型'
     }

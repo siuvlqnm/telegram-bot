@@ -2,6 +2,7 @@ import { TelegramCallbackQuery } from '@/types/telegram';
 import { setUserModel } from '@/contexts/model-states';
 import { sendMessage } from '@/utils/telegram';
 import { AI_MODELS } from '@/types/ai';
+import { setUserState } from '@/contexts/user-states';
 
 export async function handleCallbackQuery(callback_query: TelegramCallbackQuery, kv: KVNamespace) {
     const chatId = callback_query.message.chat.id;
@@ -33,8 +34,9 @@ async function handleModelSelection(chatId: number, userId: number, data: string
         await setUserModel(kv, userId, modelId);
         await sendMessage(
             chatId, 
-            `模型已切换为: ${selectedModel.name}\n${selectedModel.description}`
+            `模型已切换为: ${selectedModel.name}\n${selectedModel.description}, 请开始对话。`
         );
+        await setUserState(kv, userId, 'AI');
     } catch (error) {
         console.error('Error setting user model:', error);
         await sendMessage(chatId, '保存模型选择时出现错误，请稍后重试。');

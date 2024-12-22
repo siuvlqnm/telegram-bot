@@ -7,8 +7,8 @@ mode = "smart"
 type = "module"
 
 [vars]
-TELEGRAM_BOT_TOKEN = ""
-OPENROUTER_API_KEY = ""
+TELEGRAM_BOT_TOKEN = "7564589622:AAG_zBFq13ddWqU1btFStKNE38tZhFtxGTY"
+OPENROUTER_API_KEY = "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"
 
 [[kv_namespaces]]
 id = "e24d480067f14571b4a1dbe1837073be"

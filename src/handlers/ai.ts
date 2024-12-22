@@ -9,7 +9,7 @@ const userContexts = new Map<number, { role: 'user' | 'assistant', content: stri
 export async function handleAiMessage(chatId: number, text: string){
     const userModel = await getUserModel(TELEGRAM_BOT_KV(), chatId);
     if (!userModel) {
-        await sendMessage(chatId, "模型未设置，请先设置模型。");
+        await sendMessage(chatId, "❌ 模型未设置，请先设置模型。");
         return;
     }
 
@@ -24,7 +24,7 @@ export async function handleAiMessage(chatId: number, text: string){
     try {
        const aiResponse = await getAiResponse(userMessages, userModel);
        if (!aiResponse) {
-            await sendMessage(chatId, "AI 助手出现了一些问题，请稍后再试。");
+            await sendMessage(chatId, "❌ AI 助手出现了一些问题，请稍后再试。");
             return;
        }
        userMessages.push({ role: 'assistant', content: aiResponse});
@@ -34,6 +34,6 @@ export async function handleAiMessage(chatId: number, text: string){
       await sendMessage(chatId, aiResponse, { parse_mode: 'MarkdownV2' });
    } catch (error) {
       console.error("AI API Error:", error);
-      await sendMessage(chatId, "AI API Error:" + error);
+      await sendMessage(chatId, "❌ AI API Error:" + error);
     }
 }

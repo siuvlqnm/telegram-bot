@@ -12,11 +12,11 @@ export async function handleTextMessage(message: TelegramMessage, currentState: 
    }
 
    if (text.startsWith("/calc")) {
-      await sendMessage(chatId, "请提供一个要计算的算式");
+      await sendMessage(chatId, "🧮 请提供一个要计算的算式");
       return;
    }
    if (text.startsWith("/ai")) {
-      await sendMessage(chatId, "请输入要问的问题");
+      await sendMessage(chatId, "🤖 请输入要问的问题");
       return;
    }
    if (text.startsWith("/model")) {

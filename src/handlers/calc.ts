@@ -40,5 +40,5 @@ function calculate(expression: string): number | string {
 
  export async function handleCalcCommand(chatId: number, text: string) {
      const result = calculate(text);
-     await sendMessage(chatId, `结果是: ${result}`);
+     await sendMessage(chatId, `🧮 结果是: ${result}`);
  }

@@ -3,10 +3,16 @@ import { getModelByUniqueId, getProviderById } from '@/types/ai';
 import { OPENROUTER_API_KEY, DEEPSEEK_API_KEY } from '@/config';
 
 // API 密钥配置
-const API_KEYS: Record<string, string> = {
-    'openrouter': OPENROUTER_API_KEY(),
-    'deepseek': DEEPSEEK_API_KEY()
-};
+function getApiKey(providerId: string): string {
+    switch (providerId) {
+        case 'openrouter':
+            return OPENROUTER_API_KEY();
+        case 'deepseek':
+            return DEEPSEEK_API_KEY();
+        default:
+            return '';
+    }
+}
 
 export class AIServiceFactory {
     static getService(uniqueId: string): BaseAIService {
@@ -23,9 +29,9 @@ export class AIServiceFactory {
         }
 
         // 获取 API 密钥
-        const apiKey = API_KEYS[model.providerId];
+        const apiKey = getApiKey(model.providerId);
         if (!apiKey) {
-            throw new Error(`API key not found for provider: ${model.providerId}`);
+            throw new Error(`API key not configured for provider: ${model.providerId}`);
         }
 
         // 创建并返回服务实例

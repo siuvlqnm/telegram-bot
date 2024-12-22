@@ -27,6 +27,11 @@ export class BaseAIService {
                 model: this.modelId,
                 messages: messages
             });
+
+            if (!completion.choices || !completion.choices[0] || !completion.choices[0].message || !completion.choices[0].message.content) {
+                return '❌ AI completion error';
+            }
+            
             return completion.choices[0].message.content || '';
         } catch (error) {
             console.error('AI API Error:', error);

@@ -1,6 +1,6 @@
 import { BaseAIService, AIServiceConfig } from './base';
 import { getModelByUniqueId, getProviderById } from '@/types/ai';
-import { OPENROUTER_API_KEY, DEEPSEEK_API_KEY } from '@/config';
+import { OPENROUTER_API_KEY, DEEPSEEK_API_KEY, GOOGLE_API_KEY } from '@/config';
 
 // API 密钥配置
 function getApiKey(providerId: string): string {
@@ -9,6 +9,8 @@ function getApiKey(providerId: string): string {
             return OPENROUTER_API_KEY();
         case 'deepseek':
             return DEEPSEEK_API_KEY();
+        case 'google':
+            return GOOGLE_API_KEY();
         default:
             return '';
     }

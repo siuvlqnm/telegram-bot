@@ -32,11 +32,24 @@ export const AI_PROVIDERS: Record<string, AIProvider> = {
         name: 'DeepSeek',
         description: '深度求索（DeepSeek）公司开发的 AI 模型',
         baseURL: 'https://api.deepseek.com',
+    },
+    'google': {
+        id: 'google',
+        name: 'Gemini',
+        description: '谷歌的 AI 模型',
+        baseURL: 'https://generativelanguage.googleapis.com',
     }
 };
 
 // 可用的 AI 模型列表
 export const AI_MODELS: AIModel[] = [
+    {
+        providerId: 'openrouter',
+        modelId: 'google/gemini-2.0-flash-exp:free',
+        uniqueId: 'openrouter:google/gemini-2.0-flash-exp:free',
+        name: 'Gemini 2.0 Flash',
+        description: '谷歌最新的 AI 模型'
+    },
     {
         providerId: 'openrouter',
         modelId: 'google/gemini-2.0-flash-thinking-exp:free',
@@ -71,7 +84,14 @@ export const AI_MODELS: AIModel[] = [
         uniqueId: 'deepseek:deepseek-chat',
         name: 'DeepSeek Chat',
         description: '深度求索（DeepSeek）公司开发的 AI 模型'
-    }
+    },
+    {
+        providerId: 'google',
+        modelId: 'gemini-2.0-flash-exp',
+        uniqueId: 'google:gemini-2.0-flash-exp',
+        name: 'Gemini 2.0 Flash',
+        description: '谷歌的 AI 模型'
+    },
 ];
 
 // AI 消息类型

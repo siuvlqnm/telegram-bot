@@ -1,7 +1,8 @@
 import { sendMessage, deleteMessage } from '@/utils/telegram';
 import { AI_MODELS, AI_PROVIDERS, AIModel, getProviderById } from '@/types/ai';
 import { setUserModel } from '@/contexts/model-states';
-
+import { setUserState } from '@/contexts/user-states';
+import { TELEGRAM_BOT_KV } from '@/config';
 // 显示提供商选择界面
 export async function showProviderSelection(chatId: number) {
     const keyboard = {
@@ -69,7 +70,8 @@ async function handleModelSelectionDirect(chatId: number, messageId: number, mod
     const provider = getProviderById(model.providerId);
     await sendMessage(
         chatId,
-        `✅ 已选择 ${provider?.name} 的 ${model.name}\n${model.description}`
+        `✅ 已选择 ${provider?.name} 的 ${model.name}\n${model.description} \n\n 请开始对话`
     );
+    await setUserState(TELEGRAM_BOT_KV(), chatId, 'AI');
     await deleteMessage(chatId, messageId);
 } 

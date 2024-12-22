@@ -9,6 +9,7 @@ type = "module"
 [vars]
 TELEGRAM_BOT_TOKEN = ""
 OPENROUTER_API_KEY = ""
+DEEPSEEK_API_KEY = ""
 
 [[kv_namespaces]]
 id = "e24d480067f14571b4a1dbe1837073be"

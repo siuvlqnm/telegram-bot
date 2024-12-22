@@ -1,46 +1,33 @@
 import { TelegramCallbackQuery } from '@/types/telegram';
-import { setUserModel } from '@/contexts/model-states';
+import { showProviderModels, handleModelSelection, showProviderSelection } from './model-selection';
 import { sendMessage, deleteMessage } from '@/utils/telegram';
-import { AI_MODELS } from '@/types/ai';
-import { setUserState } from '@/contexts/user-states';
 
 export async function handleCallbackQuery(callback_query: TelegramCallbackQuery, kv: KVNamespace) {
     const chatId = callback_query.message.chat.id;
+    const messageId = callback_query.message.message_id;
     const userId = callback_query.from.id;
     const data = callback_query.data;
-    const messageId = callback_query.message.message_id;
 
     try {
-        if (data.startsWith('/select_')) {
-            await handleModelSelection(chatId, messageId, userId, data, kv);
+        // 处理提供商选择
+        if (data.startsWith('/provider_')) {
+            const providerId = data.split('_')[1];
+            await showProviderModels(chatId, providerId);
+            return;
         }
-        // 未来可以在这里添加其他类型的回调处理
+
+        // 处理模型选择
+        if (data.startsWith('/select_')) {
+            const uniqueId = data.split('/select_')[1];
+            await handleModelSelection(chatId, userId, messageId, uniqueId, kv);
+            return;
+        }
+
     } catch (error) {
         console.error('Error handling callback query:', error);
-        await sendMessage(chatId, '❌ 处理请求时出现错误，请稍后重试。');
-    }
-}
-
-async function handleModelSelection(chatId: number, messageId: number, userId: number, data: string, kv: KVNamespace) {
-    const modelId = data.split('_')[1];
-    
-    // 验证模型是否有效
-    const selectedModel = AI_MODELS.find(model => model.id === modelId);
-    if (!selectedModel) {
-        await sendMessage(chatId, '❌ 无效的模型选择');
-        return;
-    }
-
-    try {
-        await setUserModel(kv, userId, modelId);
         await sendMessage(
             chatId, 
-            `✅ 已选择模型: ${selectedModel.name}\n${selectedModel.description}, 请开始对话。`
+            '❌ 处理请求时出现错误，请稍后重试。'
         );
-        await setUserState(kv, userId, 'AI');
-        await deleteMessage(chatId, messageId);
-    } catch (error) {
-        console.error('Error setting user model:', error);
-        await sendMessage(chatId, '❌ 保存模型选择时出现错误，请稍后重试。');
     }
-} 
+}

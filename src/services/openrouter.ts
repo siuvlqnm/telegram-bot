@@ -1,17 +1,17 @@
 import { OpenAI } from 'openai';
-import { OPENROUTER_API_KEY } from '@/config';
+import { DEEPSEEK_API_KEY } from '@/config';
 
 export async function getAiResponse(messages: any[], model: string) {
   try {
     const openai = new OpenAI({
-      baseURL: "https://openrouter.ai/api/v1",
-      apiKey: OPENROUTER_API_KEY(),
-      defaultHeaders: {
-        "X-Title": "Telegram Bot", // Optional. Shows in rankings on openrouter.ai.
-      }
+      baseURL: "https://api.deepseek.com",
+      apiKey: DEEPSEEK_API_KEY(),
+      // defaultHeaders: {
+      //   "X-Title": "Telegram Bot", // Optional. Shows in rankings on openrouter.ai.
+      // }
     });
     const completion = await openai.chat.completions.create({
-       model: model,
+       model: 'deepseek-chat',
        messages: messages,
     });
 

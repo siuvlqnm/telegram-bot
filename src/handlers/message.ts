@@ -2,7 +2,8 @@ import { TelegramMessage } from "@/types/telegram";
 import { handleCalcCommand } from "@/handlers/calc";
 import { sendMessage } from '@/utils/telegram';
 import { handleAiMessage } from "@/handlers/ai";
-import { showModelSelection } from "@/handlers/model";
+import { showProviderSelection } from "@/handlers/model-selection";
+
 
 export async function handleTextMessage(message: TelegramMessage, currentState: string) {
    const chatId = message.chat.id;
@@ -20,7 +21,7 @@ export async function handleTextMessage(message: TelegramMessage, currentState: 
       return;
    }
    if (text.startsWith("/model")) {
-      await showModelSelection(chatId);
+      await showProviderSelection(chatId);
       return;
    }
 

@@ -3,26 +3,7 @@ import { sendMessage } from '@/utils/telegram';
 import { getUserModel } from '@/contexts/model-states';
 import { DEFAULT_MODEL, getModelByUniqueId } from '@/types/ai';
 import { TELEGRAM_BOT_KV } from '@/config';
-
-// 使用 KV 存储上下文
-async function getUserContext(kv: KVNamespace, chatId: number) {
-    const context = await kv.get(`chat:${chatId}:context`);
-    return context ? JSON.parse(context) : [];
-}
-
-async function setUserContext(kv: KVNamespace, chatId: number, messages: any[]) {
-    await kv.put(`chat:${chatId}:context`, JSON.stringify(messages));
-}
-
-// 清除用户上下文
-export function clearUserContext(kv: KVNamespace, userId: number) {
-    kv.delete(`chat:${userId}:context`);
-}
-
-// 获取用户上下文长度
-// export function getUserContextLength(kv: KVNamespace, userId: number): number {
-//     return kv.get(`chat:${userId}:context`)?.   ;
-// }
+import { getUserContext, setUserContext, clearUserContext, getUserContextLength } from '@/contexts/chat-context';
 
 export async function handleAiMessage(chatId: number, text: string) {
     try {

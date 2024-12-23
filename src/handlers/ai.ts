@@ -1,11 +1,28 @@
 import { AIServiceFactory } from '@/services/ai/factory';
 import { sendMessage } from '@/utils/telegram';
 import { getUserModel } from '@/contexts/model-states';
-import { DEFAULT_MODEL, AIMessage, getModelByUniqueId } from '@/types/ai';
+import { DEFAULT_MODEL, getModelByUniqueId } from '@/types/ai';
 import { TELEGRAM_BOT_KV } from '@/config';
 
-// 简化版上下文管理
-const userContexts = new Map<number, AIMessage[]>();
+// 使用 KV 存储上下文
+async function getUserContext(kv: KVNamespace, chatId: number) {
+    const context = await kv.get(`chat:${chatId}:context`);
+    return context ? JSON.parse(context) : [];
+}
+
+async function setUserContext(kv: KVNamespace, chatId: number, messages: any[]) {
+    await kv.put(`chat:${chatId}:context`, JSON.stringify(messages));
+}
+
+// 清除用户上下文
+export function clearUserContext(kv: KVNamespace, userId: number) {
+    kv.delete(`chat:${userId}:context`);
+}
+
+// 获取用户上下文长度
+// export function getUserContextLength(kv: KVNamespace, userId: number): number {
+//     return kv.get(`chat:${userId}:context`)?.   ;
+// }
 
 export async function handleAiMessage(chatId: number, text: string) {
     try {
@@ -18,13 +35,13 @@ export async function handleAiMessage(chatId: number, text: string) {
             return;
         }
 
-        // 获取用户的上下文
-        let userMessages = userContexts.get(chatId) || [];
+        // 从 KV 获取用户上下文
+        let userMessages = await getUserContext(TELEGRAM_BOT_KV(), chatId);
         userMessages.push({ role: 'user', content: text });
 
-        // 限制上下文消息数量（保留最近的5条消息）
-        if (userMessages.length > 10) {
-            userMessages = userMessages.slice(-10);
+        // 限制上下文消息数量
+        if (userMessages.length > 5) {
+            userMessages = userMessages.slice(-5);
         }
 
         try {
@@ -34,11 +51,11 @@ export async function handleAiMessage(chatId: number, text: string) {
 
             // 保存助手的回复到上下文
             userMessages.push({ role: 'assistant', content: aiResponse });
-            userContexts.set(chatId, userMessages);
-
+            // 保存更新后的上下文到 KV
+            await setUserContext(TELEGRAM_BOT_KV(), chatId, userMessages);
             // 发送响应给用户
             await sendMessage(chatId, aiResponse, { 
-                parse_mode: 'Markdown',
+                parse_mode: 'MarkdownV2',
                 // 如果消息发送失败，尝试不使用 Markdown
                 fallback: async (text: string) => {
                     await sendMessage(chatId, text);
@@ -62,14 +79,4 @@ export async function handleAiMessage(chatId: number, text: string) {
         console.error("General Error:", error);
         await sendMessage(chatId, "❌ 系统出现错误，请稍后重试");
     }
-}
-
-// 清除用户上下文
-export function clearUserContext(userId: number) {
-    userContexts.delete(userId);
-}
-
-// 获取用户上下文长度
-export function getUserContextLength(userId: number): number {
-    return userContexts.get(userId)?.length || 0;
 }

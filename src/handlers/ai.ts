@@ -39,9 +39,11 @@ export async function handleAiMessage(chatId: number, text: string) {
         let userMessages = await getUserContext(TELEGRAM_BOT_KV(), chatId);
         userMessages.push({ role: 'user', content: text });
 
-        // 限制上下文消息数量
+        // 限制上下文消息数量，保留第一条和最近的消息
         if (userMessages.length > 5) {
-            userMessages = userMessages.slice(-5);
+            const firstMessage = userMessages[0];
+            userMessages = userMessages.slice(-4);  // 只保留最近的4条
+            userMessages.unshift(firstMessage);     // 将第一条消息添加回开头
         }
 
         try {

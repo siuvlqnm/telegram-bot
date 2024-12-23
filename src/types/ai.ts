@@ -117,3 +117,37 @@ export function getModelByUniqueId(uniqueId: string): AIModel | undefined {
 export function getProviderById(providerId: string): AIProvider | undefined {
     return AI_PROVIDERS[providerId];
 }
+
+// 提示词类型定义
+export type Prompt = {
+    id: string;
+    name: string;
+    description: string;
+    content: string;
+};
+
+// 预定义的提示词列表
+export const PROMPTS: Prompt[] = [
+    {
+        id: 'default',
+        name: '默认对话',
+        description: '普通的对话模式',
+        content: ''
+    },
+    {
+        id: 'translator',
+        name: '翻译助手',
+        description: '帮助翻译各种语言',
+        content: '你现在是一位专业的翻译官，请帮我翻译接下来的内容，并解释其中的难点和文化差异。'
+    },
+    {
+        id: 'programmer',
+        name: '编程助手',
+        description: '解答编程相关问题',
+        content: '你是一位经验丰富的程序员，请用专业且易懂的方式回答我的技术问题，并提供代码示例。'
+    }
+];
+
+export function getPromptById(promptId: string): Prompt | undefined {
+    return PROMPTS.find(prompt => prompt.id === promptId);
+}

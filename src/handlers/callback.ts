@@ -1,6 +1,7 @@
 import { TelegramCallbackQuery } from '@/types/telegram';
-import { showProviderModels, handleModelSelection, showProviderSelection } from './model-selection';
+import { showProviderModels, handleModelSelection, showProviderSelection } from '@/handlers/model-selection';
 import { sendMessage, deleteMessage } from '@/utils/telegram';
+import { handlePromptSelection } from '@/handlers/prompt-selection';
 
 export async function handleCallbackQuery(callback_query: TelegramCallbackQuery, kv: KVNamespace) {
     const chatId = callback_query.message.chat.id;
@@ -20,6 +21,13 @@ export async function handleCallbackQuery(callback_query: TelegramCallbackQuery,
         if (data.startsWith('/select_')) {
             const uniqueId = data.split('/select_')[1];
             await handleModelSelection(chatId, userId, messageId, uniqueId, kv);
+            return;
+        }
+
+        // 处理提示词选择
+        if (data.startsWith('/prompt_')) {
+            const promptId = data.split('/prompt_')[1];
+            await handlePromptSelection(chatId, userId, messageId, promptId, kv);
             return;
         }
 

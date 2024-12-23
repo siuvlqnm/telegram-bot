@@ -4,6 +4,7 @@ import { sendMessage } from '@/utils/telegram';
 import { getUserState, setUserState } from '@/contexts/user-states';
 import { handleStart } from '@/handlers/start';
 import { handleTextMessage } from '@/handlers/message';
+import { showPromptSelection } from '@/handlers/prompt-selection';
 
 export async function handleCommands(message: any) {
     const chatId = message.chat.id;
@@ -31,6 +32,11 @@ export async function handleCommands(message: any) {
         case '/calc':
             await setUserState(TELEGRAM_BOT_KV(), chatId, 'CALC');
             await handleTextMessage(message, 'CALC');
+            return;
+        case '/prompt':
+            await clearUserContext(TELEGRAM_BOT_KV(), chatId);
+            await setUserState(TELEGRAM_BOT_KV(), chatId, 'IDLE');
+            await showPromptSelection(chatId);
             return;
     }
 

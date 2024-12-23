@@ -10,7 +10,8 @@ export async function handleCommands(message: any) {
     const text = message.text;
 
     switch (text) {
-        case '/start' || '/cancel':
+        case '/start':
+        case '/cancel':
             await setUserState(TELEGRAM_BOT_KV(), chatId, 'IDLE');
             await handleStart(chatId);
             break;

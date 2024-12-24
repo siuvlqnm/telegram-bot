@@ -5,6 +5,7 @@ import { DEFAULT_MODEL, getModelByUniqueId } from '@/types/ai';
 import { TELEGRAM_BOT_KV } from '@/config';
 import { getUserContext, setUserContext } from '@/contexts/chat-context';
 import { getUserPrompt } from '@/contexts/prompt-states';
+import { getPromptById } from '@/types/ai';
 
 export async function handleAiMessage(chatId: number, text: string) {    
     try {
@@ -23,7 +24,10 @@ export async function handleAiMessage(chatId: number, text: string) {
         
         // 如果是新对话，添加系统 prompt
         if (userMessages.length === 0 && userPrompt !== 'default') {
-            userMessages.push({ role: 'system', content: userPrompt });
+            const prompt = getPromptById(userPrompt);
+            if (prompt) {
+                userMessages.push({ role: 'system', content: prompt.content });
+            }
         }
         
         userMessages.push({ role: 'user', content: text });

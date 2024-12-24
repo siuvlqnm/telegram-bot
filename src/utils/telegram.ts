@@ -14,6 +14,7 @@ export async function sendMessage(chat_id: number, text: string, reply_markup?: 
     reply_markup,
   };
   try{
+    console.log('Sending message to:', chat_id, 'text:', text);
     await fetchApi(url, {
       method: 'POST',
       headers: {

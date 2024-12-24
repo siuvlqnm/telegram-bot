@@ -3,7 +3,7 @@ import { sendMessage } from '@/utils/telegram';
 import { getUserModel } from '@/contexts/model-states';
 import { DEFAULT_MODEL, getModelByUniqueId } from '@/types/ai';
 import { TELEGRAM_BOT_KV } from '@/config';
-import { getUserContext, setUserContext, clearUserContext, getUserContextLength } from '@/contexts/chat-context';
+import { getUserContext, setUserContext } from '@/contexts/chat-context';
 
 export async function handleAiMessage(chatId: number, text: string) {
     try {

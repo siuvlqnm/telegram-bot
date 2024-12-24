@@ -2,6 +2,7 @@ import { sendMessage, deleteMessage } from '@/utils/telegram';
 import { AI_MODELS, AI_PROVIDERS, AIModel, getProviderById } from '@/types/ai';
 import { setUserModel } from '@/contexts/model-states';
 import { setUserState } from '@/contexts/user-states';
+import { setUserPrompt } from '@/contexts/prompt-states';
 import { TELEGRAM_BOT_KV } from '@/config';
 // 显示提供商选择界面
 export async function showProviderSelection(chatId: number) {
@@ -58,6 +59,7 @@ export async function handleModelSelection(chatId: number, userId: number, messa
 
     try {
         await setUserModel(kv, userId, uniqueId);
+        await setUserPrompt(kv, userId, 'default');
         await handleModelSelectionDirect(chatId, messageId, selectedModel);
     } catch (error) {
         console.error('Error in model selection:', error);

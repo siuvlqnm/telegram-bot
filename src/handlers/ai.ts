@@ -4,11 +4,14 @@ import { getUserModel } from '@/contexts/model-states';
 import { DEFAULT_MODEL, getModelByUniqueId } from '@/types/ai';
 import { TELEGRAM_BOT_KV } from '@/config';
 import { getUserContext, setUserContext } from '@/contexts/chat-context';
+import { getUserPrompt } from '@/contexts/prompt-states';
 
 export async function handleAiMessage(chatId: number, text: string) {    
     try {
-        // 获取用户选择的模型
+        // 获取用户选择的模型和 prompt
         const modelUniqueId = await getUserModel(TELEGRAM_BOT_KV(), chatId) || DEFAULT_MODEL;
+        const userPrompt = await getUserPrompt(TELEGRAM_BOT_KV(), chatId);
+        
         const model = getModelByUniqueId(modelUniqueId);
         if (!model) {
             await sendMessage(chatId, "❌ 模型配置错误，请重新选择模型 (/model)");
@@ -17,6 +20,12 @@ export async function handleAiMessage(chatId: number, text: string) {
 
         // 从 KV 获取用户上下文
         let userMessages = await getUserContext(TELEGRAM_BOT_KV(), chatId);
+        
+        // 如果是新对话，添加系统 prompt
+        if (userMessages.length === 0 && userPrompt !== 'default') {
+            userMessages.push({ role: 'system', content: userPrompt });
+        }
+        
         userMessages.push({ role: 'user', content: text });
 
         // 限制上下文消息数量

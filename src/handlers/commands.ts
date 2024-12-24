@@ -5,6 +5,7 @@ import { getUserState, setUserState } from '@/contexts/user-states';
 import { handleStart } from '@/handlers/start';
 import { handleTextMessage } from '@/handlers/message';
 import { showPromptSelection } from '@/handlers/prompt-selection';
+import { setUserPrompt } from '@/contexts/prompt-states';
 
 export async function handleCommands(message: any) {
     const chatId = message.chat.id;
@@ -18,10 +19,12 @@ export async function handleCommands(message: any) {
             return;
         case '/clear':
             await clearUserContext(TELEGRAM_BOT_KV(), chatId);
+            await setUserPrompt(TELEGRAM_BOT_KV(), chatId, 'default');
             await sendMessage(chatId, "✨ 已清除对话历史");
             return;
         case '/model':
             await clearUserContext(TELEGRAM_BOT_KV(), chatId);
+            await setUserPrompt(TELEGRAM_BOT_KV(), chatId, 'default');
             await setUserState(TELEGRAM_BOT_KV(), chatId, 'IDLE');
             await handleTextMessage(message, 'IDLE');
             return;

@@ -6,10 +6,17 @@ import { handleStart } from '@/handlers/start';
 import { handleTextMessage } from '@/handlers/message';
 import { showPromptSelection } from '@/handlers/prompt-selection';
 import { setUserPrompt } from '@/contexts/prompt-states';
+import { handleTMDBCommand } from '@/handlers/tmdb';
 
 export async function handleCommands(message: any) {
     const chatId = message.chat.id;
     const text = message.text;
+
+    if (text.startsWith('/tmdb ')) {
+        const query = text.substring(6).trim();
+        await handleTMDBCommand(chatId, query);
+        return;
+    }
 
     switch (text) {
         case '/start':
@@ -40,6 +47,9 @@ export async function handleCommands(message: any) {
             await clearUserContext(TELEGRAM_BOT_KV(), chatId);
             await setUserState(TELEGRAM_BOT_KV(), chatId, 'IDLE');
             await showPromptSelection(chatId);
+            return;
+        case '/tmdb':
+            await sendMessage(chatId, '请输入要搜索的电影名称，例如：/tmdb 泰坦尼克号');
             return;
     }
 

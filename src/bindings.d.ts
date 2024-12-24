@@ -1,10 +1,11 @@
 // 添加 Cloudflare Workers 类型
 /// <reference types="@cloudflare/workers-types" />
 
-export type Bindings = {
+export interface Bindings {
     TELEGRAM_BOT_TOKEN: string;
     OPENROUTER_API_KEY: string;
     DEEPSEEK_API_KEY: string;
     GOOGLE_API_KEY: string;
     TELEGRAM_BOT_KV: KVNamespace;
-};
+    TMDB_API_KEY: string;
+}

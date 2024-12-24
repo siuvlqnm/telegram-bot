@@ -6,6 +6,7 @@ import { showProviderSelection } from "@/handlers/model-selection";
 
 
 export async function handleTextMessage(message: TelegramMessage, currentState: string) {
+   console.log('handleTextMessage');
    const chatId = message.chat.id;
    const text = message.text;
    if (!text) {

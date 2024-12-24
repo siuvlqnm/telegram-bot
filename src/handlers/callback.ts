@@ -4,6 +4,7 @@ import { sendMessage, deleteMessage } from '@/utils/telegram';
 import { handlePromptSelection } from '@/handlers/prompt-selection';
 
 export async function handleCallbackQuery(callback_query: TelegramCallbackQuery, kv: KVNamespace) {
+    console.log('handleCallbackQuery');
     const chatId = callback_query.message.chat.id;
     const messageId = callback_query.message.message_id;
     const userId = callback_query.from.id;

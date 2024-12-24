@@ -6,6 +6,7 @@ import { TELEGRAM_BOT_KV } from '@/config';
 import { getUserContext, setUserContext } from '@/contexts/chat-context';
 
 export async function handleAiMessage(chatId: number, text: string) {
+    console.log('handleAiMessage');
     try {
         // 获取用户选择的模型
         const modelUniqueId = await getUserModel(TELEGRAM_BOT_KV(), chatId) || DEFAULT_MODEL;

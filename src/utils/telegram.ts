@@ -2,6 +2,7 @@ import { fetchApi } from "@/utils/api";
 import { TELEGRAM_BOT_TOKEN } from '@/config';
 
 export async function sendMessage(chat_id: number, text: string, reply_markup?: any) {
+  console.log('sendMessage');
   const botToken = TELEGRAM_BOT_TOKEN();
   if (!botToken) {
       console.error('Telegram Bot token not found in environment variables.');

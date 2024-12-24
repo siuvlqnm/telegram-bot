@@ -13,10 +13,6 @@ app.use('/*', cors());
 app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
    initializeConfig(c.env);
    try {
-
-      console.log('index.ts');
-      console.log('Received webhook:', await c.req.json());
-
       const update = c.req.valid('json');
       const message = update.message;
       const callback_query = update.callback_query;

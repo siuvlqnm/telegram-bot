@@ -1,5 +1,4 @@
 export async function fetchApi<T>(url: string, options: RequestInit = {}): Promise<T> {
-    console.log('fetchApi');
     try {
        const response = await fetch(url, options);
        if (!response.ok) {

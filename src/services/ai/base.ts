@@ -54,24 +54,58 @@ export class BaseAIService {
             });
 
             try {
-                console.log('Sending request to OpenAI API...');
-                const completion = await this.client.chat.completions.create({
-                    model: this.modelId,
-                    messages: messages
+                console.log('Sending request to OpenAI API...', {
+                    modelId: this.modelId,
+                    messagesCount: messages.length,
+                    baseURL: this.client.baseURL
                 });
-                console.log('API request successful');
 
-                if (!completion.choices || !completion.choices[0]) {
+                let response;
+                try {
+                    response = await this.client.chat.completions.create({
+                        model: this.modelId,
+                        messages: messages,
+                        temperature: 0.7,
+                        max_tokens: 1000
+                    }).catch(error => {
+                        console.error('Request failed in catch block:', {
+                            name: error.name,
+                            message: error.message,
+                            code: error.code,
+                            type: error.type,
+                            status: error?.response?.status,
+                            data: error?.response?.data
+                        });
+                        throw error;
+                    });
+                    
+                    console.log('Raw API response received:', {
+                        hasResponse: !!response,
+                        hasChoices: !!response?.choices,
+                        choicesLength: response?.choices?.length,
+                        firstChoice: !!response?.choices?.[0]
+                    });
+                } catch (error) {
+                    console.error('API call error details:', {
+                        errorType: typeof error,
+                        errorName: (error as Error)?.name,
+                        errorMessage: (error as Error)?.message,
+                        stack: (error as Error)?.stack?.split('\n').slice(0, 3)
+                    });
+                    throw error;
+                }
+
+                if (!response || !response.choices || !response.choices[0]) {
                     console.error('No choices in completion response');
                     return '❌ AI completion error: No choices available';
                 }
 
-                if (!completion.choices[0].message || !completion.choices[0].message.content) {
+                if (!response.choices[0].message || !response.choices[0].message.content) {
                     console.error('No message content in completion response');
                     return '❌ AI completion error: No message content';
                 }
                 
-                const content = completion.choices[0].message.content;
+                const content = response.choices[0].message.content;
                 console.log('Successfully extracted content, length:', content.length);
                 console.log('=== End getCompletion ===');
                 return content;

@@ -42,27 +42,47 @@ export class BaseAIService {
         console.log('Using model:', this.modelId);
         
         try {
-            console.log('Sending request to OpenAI API...');
-            const completion = await this.client.chat.completions.create({
-                model: this.modelId,
-                messages: messages
+            console.log('Preparing OpenAI API request...', {
+                modelId: this.modelId,
+                messagesCount: messages.length,
+                lastMessageContent: messages[messages.length - 1]?.content?.slice(0, 50) + '...'
             });
-            console.log('Response received from API');
 
-            if (!completion.choices || !completion.choices[0]) {
-                console.error('No choices in completion response');
-                return '❌ AI completion error: No choices available';
-            }
+            console.log('API Configuration:', {
+                baseURL: this.client.baseURL,
+                hasApiKey: !!this.client.apiKey
+            });
 
-            if (!completion.choices[0].message || !completion.choices[0].message.content) {
-                console.error('No message content in completion response');
-                return '❌ AI completion error: No message content';
+            try {
+                console.log('Sending request to OpenAI API...');
+                const completion = await this.client.chat.completions.create({
+                    model: this.modelId,
+                    messages: messages
+                });
+                console.log('API request successful');
+
+                if (!completion.choices || !completion.choices[0]) {
+                    console.error('No choices in completion response');
+                    return '❌ AI completion error: No choices available';
+                }
+
+                if (!completion.choices[0].message || !completion.choices[0].message.content) {
+                    console.error('No message content in completion response');
+                    return '❌ AI completion error: No message content';
+                }
+                
+                const content = completion.choices[0].message.content;
+                console.log('Successfully extracted content, length:', content.length);
+                console.log('=== End getCompletion ===');
+                return content;
+            } catch (error) {
+                console.error('API request failed:', {
+                    error: error instanceof Error ? error.message : 'Unknown error',
+                    modelId: this.modelId,
+                    baseURL: this.client.baseURL
+                });
+                throw error;
             }
-            
-            const content = completion.choices[0].message.content;
-            console.log('Successfully extracted content, length:', content.length);
-            console.log('=== End getCompletion ===');
-            return content;
         } catch (error) {
             console.error('AI API Error:', {
                 error: error instanceof Error ? error.message : error,

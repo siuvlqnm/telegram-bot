@@ -13,29 +13,62 @@ export class BaseAIService {
     protected modelId: string;
 
     constructor(config: AIServiceConfig) {
-        this.client = new OpenAI({
-            apiKey: config.apiKey,
+        console.log('=== Initializing BaseAIService ===');
+        console.log('Configuration received:', {
             baseURL: config.baseURL,
-            defaultHeaders: config.defaultHeaders
+            modelId: config.modelId,
+            hasApiKey: !!config.apiKey,
+            hasHeaders: !!config.defaultHeaders
         });
-        this.modelId = config.modelId;
+
+        try {
+            this.client = new OpenAI({
+                apiKey: config.apiKey,
+                baseURL: config.baseURL,
+                defaultHeaders: config.defaultHeaders
+            });
+            this.modelId = config.modelId;
+            console.log('OpenAI client initialized successfully');
+        } catch (error) {
+            console.error('Failed to initialize OpenAI client:', error);
+            throw error;
+        }
+        console.log('=== BaseAIService initialization complete ===');
     }
 
     async getCompletion(messages: any[]): Promise<string> {
+        console.log('=== Start getCompletion ===');
+        console.log('Input messages count:', messages.length);
+        console.log('Using model:', this.modelId);
+        
         try {
+            console.log('Sending request to OpenAI API...');
             const completion = await this.client.chat.completions.create({
                 model: this.modelId,
                 messages: messages
             });
+            console.log('Response received from API');
 
-            if (!completion.choices || !completion.choices[0] || !completion.choices[0].message || !completion.choices[0].message.content) {
-                return '❌ AI completion error';
+            if (!completion.choices || !completion.choices[0]) {
+                console.error('No choices in completion response');
+                return '❌ AI completion error: No choices available';
+            }
+
+            if (!completion.choices[0].message || !completion.choices[0].message.content) {
+                console.error('No message content in completion response');
+                return '❌ AI completion error: No message content';
             }
             
-            return completion.choices[0].message.content || '';
+            const content = completion.choices[0].message.content;
+            console.log('Successfully extracted content, length:', content.length);
+            console.log('=== End getCompletion ===');
+            return content;
         } catch (error) {
-            console.error('AI API Error:', error);
-            throw new Error(`AI service error: error`);
+            console.error('AI API Error:', {
+                error: error instanceof Error ? error.message : error,
+                stack: error instanceof Error ? error.stack : undefined
+            });
+            throw new Error(`AI service error: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
 } 

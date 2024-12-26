@@ -126,7 +126,7 @@ export async function handleTMDBCommand(chatId: number, query: string) {
             // 为每个结果创建一个按钮
             keyboard.push([{
                 text: `${index + 1}. ${title} (${year})`,
-                callback_data: `tmdb:${item.id}:${item.media_type}`
+                callback_data: `/tmdb:${item.id}:${item.media_type}`
             }]);
 
         });

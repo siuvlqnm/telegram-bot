@@ -8,6 +8,7 @@ type = "module"
 
 [vars]
 
+
 [[kv_namespaces]]
 id = "e24d480067f14571b4a1dbe1837073be"
 binding = "TELEGRAM_BOT_KV"

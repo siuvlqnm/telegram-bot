@@ -5,8 +5,34 @@ import { getUserState, setUserState } from '@/contexts/user-states';
 import { handleStart } from '@/handlers/start';
 import { handleTextMessage } from '@/handlers/message';
 import { showPromptSelection } from '@/handlers/prompt-selection';
-import { setUserPrompt } from '@/contexts/prompt-states';
+import { setUserPrompt, getUserPrompt } from '@/contexts/prompt-states';
 import { handleTMDBCommand } from '@/handlers/tmdb';
+import { getUserModel } from '@/contexts/model-states';
+import { AI_MODELS, getModelByUniqueId } from '@/types/ai';
+import { getUserContextLength } from '@/contexts/chat-context';
+
+async function handleStatus(chatId: number) {
+    const kv = TELEGRAM_BOT_KV();
+    const state = await getUserState(kv, chatId);
+    const modelId = await getUserModel(kv, chatId);
+    const promptId = await getUserPrompt(kv, chatId);
+    const model = getModelByUniqueId(modelId);
+    const contextLength = await getUserContextLength(kv, chatId);
+
+    const stateDescriptions = {
+        'IDLE': '空闲状态，等待命令',
+        'AI': 'AI 对话模式',
+        'CALC': '计算器模式',
+        'TMDB': '影视搜索模式',
+        'MODEL': '模型选择模式'
+    };
+
+    const commandHelp = `📋 可用命令：\n\n/ai - 进入AI对话模式\n/calc - 进入计算器模式\n/tmdb - 搜索影视信息\n/model - 切换AI模型\n/prompt - 切换提示词模板\n/clear - 清除对话历史\n/status - 查看当前状态`;
+
+    const statusMessage = `🤖 机器人当前状态：\n\n📱 当前模式：${state} (${stateDescriptions[state] || '未知状态'})\n🎯 当前模型：${model?.name || modelId}\n🏢 模型提供商：${model?.providerId || '未知'}\n📝 当前提示词：${promptId}\n💬 对话历史：${contextLength} 条消息\n${commandHelp}`;
+
+    await sendMessage(chatId, statusMessage);
+}
 
 export async function handleCommands(message: any) {
     const chatId = message.chat.id;
@@ -45,6 +71,9 @@ export async function handleCommands(message: any) {
         case '/tmdb':
             await setUserState(TELEGRAM_BOT_KV(), chatId, 'TMDB');
             await sendMessage(chatId, '请输入要搜索的影视名称');
+            return;
+        case '/status':
+            await handleStatus(chatId);
             return;
     }
 

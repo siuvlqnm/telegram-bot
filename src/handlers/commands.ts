@@ -44,7 +44,7 @@ export async function handleCommands(message: any) {
             return;
         case '/tmdb':
             await setUserState(TELEGRAM_BOT_KV(), chatId, 'TMDB');
-            await sendMessage(chatId, '请输入要搜索的电影名称，例如：/tmdb 泰坦尼克号');
+            await sendMessage(chatId, '请输入要搜索的影视名称');
             return;
     }
 

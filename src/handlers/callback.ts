@@ -2,6 +2,7 @@ import { TelegramCallbackQuery } from '@/types/telegram';
 import { showProviderModels, handleModelSelection, showProviderSelection } from '@/handlers/model-selection';
 import { sendMessage, deleteMessage } from '@/utils/telegram';
 import { handlePromptSelection } from '@/handlers/prompt-selection';
+import { handleTMDBCallback } from '@/handlers/tmdb';
 
 export async function handleCallbackQuery(callback_query: TelegramCallbackQuery, kv: KVNamespace) {
     const chatId = callback_query.message.chat.id;
@@ -28,6 +29,12 @@ export async function handleCallbackQuery(callback_query: TelegramCallbackQuery,
         if (data.startsWith('/prompt_')) {
             const promptId = data.split('/prompt_')[1];
             await handlePromptSelection(chatId, userId, messageId, promptId, kv);
+            return;
+        }
+
+        // 处理TMDB搜索结果
+        if (data.startsWith('tmdb:')) {
+            await handleTMDBCallback(callback_query);
             return;
         }
 

@@ -50,3 +50,12 @@ export type TelegramUpdate = {
    message?: TelegramMessage;
    callback_query?: TelegramCallbackQuery;
 };
+
+export type InlineKeyboardButton = {
+    text: string;
+    callback_data: string;
+};
+
+export type InlineKeyboardMarkup = {
+    inline_keyboard: InlineKeyboardButton[][];
+};

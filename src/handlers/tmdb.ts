@@ -1,6 +1,6 @@
 import { TMDB_API_KEY } from '@/config';
 import { sendMessage } from '@/utils/telegram';
-
+import { InlineKeyboardButton, InlineKeyboardMarkup } from '@/types/telegram';
 const TMDB_API_BASE = 'https://api.themoviedb.org/3';
 
 interface TMDBSearchResult {
@@ -35,9 +35,24 @@ async function fetchGenres(type: 'movie' | 'tv'): Promise<Map<number, string>> {
     return new Map(data.genres.map(genre => [genre.id, genre.name]));
 }
 
+interface TMDBDetailResult {
+    id: number;
+    title?: string;          // 电影标题
+    name?: string;           // 剧集名称
+    release_date?: string;   // 电影上映日期
+    first_air_date?: string; // 剧集首播日期
+    vote_average: number;    // 评分
+    overview: string;        // 简介
+    poster_path?: string;    // 海报路径
+    genres: Array<{         // 类型
+        id: number;
+        name: string;
+    }>;
+}
+
 export async function handleTMDBCommand(chatId: number, query: string) {
     if (!query) {
-        await sendMessage(chatId, '请输入要搜索的电影或剧集名称');
+        await sendMessage(chatId, '请输入要搜索的影视名称');
         return;
     }
 
@@ -64,10 +79,8 @@ export async function handleTMDBCommand(chatId: number, query: string) {
             fetchGenres('tv')
         ]);
 
-        // 只处理前 5 个结果
-        const results = data.results.slice(0, 5);
-        
-        for (const item of results) {
+        if (data.results.length === 1) {
+            const item = data.results[0];
             const isMovie = item.media_type === 'movie';
             const title = isMovie ? item.title : item.name;
             const releaseDate = isMovie ? item.release_date : item.first_air_date;
@@ -96,14 +109,75 @@ export async function handleTMDBCommand(chatId: number, query: string) {
             message += `\n📝 简介: ${item.overview || '暂无简介'}`;
 
             await sendMessage(chatId, message);
+            return;
         }
 
-        if (data.results.length > 5) {
-            await sendMessage(chatId, `还有 ${data.results.length - 5} 个结果未显示，请尝试更精确的搜索词。`);
-        }
+        let summaryMessage = '🔍 搜索结果：\n\n';
+        const keyboard: InlineKeyboardButton[][] = [];
+        data.results.forEach((item, index) => {
+            const isMovie = item.media_type === 'movie';
+            const title = isMovie ? item.title : item.name;
+            const releaseDate = isMovie ? item.release_date : item.first_air_date;
+            const year = releaseDate ? new Date(releaseDate).getFullYear() : '未知';
+            const type = isMovie ? '电影' : '剧集';
 
+            summaryMessage += `${index + 1}. ${title} (${year} ${type}) ⭐️ ${item.vote_average.toFixed(1)}\n`;
+
+            // 为每个结果创建一个按钮
+            keyboard.push([{
+                text: `${index + 1}. ${title} (${year})`,
+                callback_data: `tmdb:${item.id}:${item.media_type}`
+            }]);
+
+        });
+
+        const inlineKeyboard: InlineKeyboardMarkup = {
+            inline_keyboard: keyboard
+        };
+    
+        // 发送带有内联键盘的消息
+        await sendMessage(chatId, summaryMessage, { reply_markup: inlineKeyboard });
     } catch (error) {
         console.error('TMDB search error:', error);
         await sendMessage(chatId, '搜索时出错，请稍后重试');
     }
 } 
+
+export async function handleTMDBCallback(callbackQuery: any) {
+    const [_, tmdbId, mediaType] = callbackQuery.data.split(':');
+    const chatId = callbackQuery.message.chat.id;
+
+    try {
+        // 获取详细信息
+        const response = await fetch(
+            `${TMDB_API_BASE}/${mediaType}/${tmdbId}?api_key=${TMDB_API_KEY()}&language=zh-CN`
+        );
+
+        if (!response.ok) {
+            throw new Error(`TMDB API error: ${response.status}`);
+        }
+
+        const item: TMDBDetailResult = await response.json();
+        const genres = item.genres.map(g => g.name).join('、');
+        const releaseDate = mediaType === 'movie' ? item.release_date : item.first_air_date;
+        const title = mediaType === 'movie' ? item.title : item.name;
+        const type = mediaType === 'movie' ? '电影' : '剧集';
+
+        // 构建详细信息消息
+        let message = `🎬 ${title} (${type})\n`;
+        message += `📅 上映日期: ${releaseDate ? new Date(releaseDate).toLocaleDateString('zh-CN') : '未知'}\n`;
+        message += `⭐️ 评分: ${item.vote_average.toFixed(1)}\n`;
+        if (genres) {
+            message += `🏷️ 类型: ${genres}\n`;
+        }
+        if (item.poster_path) {
+            message += `🖼️ 海报: ${POSTER_BASE_URL}${item.poster_path}\n`;
+        }
+        message += `\n📝 简介: ${item.overview || '暂无简介'}`;
+
+        await sendMessage(chatId, message);
+    } catch (error) {
+        console.error('TMDB detail fetch error:', error);
+        await sendMessage(chatId, '获取详情时出错，请稍后重试');
+    }
+}

@@ -50,7 +50,20 @@ export const telegramUpdateSchema = z.object({
     update_id: z.number(),
     message: messageSchema.optional(),
     callback_query: callbackQuerySchema.optional(),
-});
+}).strict();
+
+// // 验证middleware
+// export const validateTelegramUpdate: MiddlewareHandler = async (c, next) => {
+//     try {
+//         const validator = zValidator('json', telegramUpdateSchema);
+//         await validator(c, next);
+//     } catch (err) {
+//         console.error('Validation error:', err);
+//         return c.json({ message: 'Invalid Telegram Update' }, 400);
+//     }
+// };
+
+
 
 // export const validateTelegramUpdate: MiddlewareHandler = async (c, next) => {
 //     try {

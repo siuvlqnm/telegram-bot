@@ -1,4 +1,4 @@
-type UserState = 'IDLE' | 'CALC' | 'AI' | 'MODEL';
+type UserState = 'IDLE' | 'CALC' | 'AI' | 'MODEL' | 'TMDB';
 
 export async function getUserState(kv: KVNamespace, userId: number): Promise<UserState> {
     const state = await kv.get(`user:${userId}:state`);

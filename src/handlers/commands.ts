@@ -12,12 +12,6 @@ export async function handleCommands(message: any) {
     const chatId = message.chat.id;
     const text = message.text;
 
-    if (text.startsWith('/tmdb ')) {
-        const query = text.substring(6).trim();
-        await handleTMDBCommand(chatId, query);
-        return;
-    }
-
     switch (text) {
         case '/start':
         case '/cancel':
@@ -49,6 +43,7 @@ export async function handleCommands(message: any) {
             await showPromptSelection(chatId);
             return;
         case '/tmdb':
+            await setUserState(TELEGRAM_BOT_KV(), chatId, 'TMDB');
             await sendMessage(chatId, '请输入要搜索的电影名称，例如：/tmdb 泰坦尼克号');
             return;
     }
@@ -60,6 +55,9 @@ export async function handleCommands(message: any) {
             return;
         case 'AI':
             await handleTextMessage(message, 'AI');
+            return;
+        case 'TMDB':
+            await handleTMDBCommand(chatId, text);
             return;
         default:
             await handleStart(chatId);

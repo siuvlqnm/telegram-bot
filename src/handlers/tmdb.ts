@@ -112,31 +112,28 @@ export async function handleTMDBCommand(chatId: number, query: string) {
             return;
         }
 
-        let summaryMessage = '🔍 搜索结果：\n\n';
         const keyboard: InlineKeyboardButton[][] = [];
-        data.results.forEach((item, index) => {
+        data.results.map((item, index) => {
             const isMovie = item.media_type === 'movie';
             const title = isMovie ? item.title : item.name;
             const releaseDate = isMovie ? item.release_date : item.first_air_date;
             const year = releaseDate ? new Date(releaseDate).getFullYear() : '未知';
             const type = isMovie ? '电影' : '剧集';
-
-            summaryMessage += `${index + 1}. ${title} (${year} ${type}) ⭐️ ${item.vote_average.toFixed(1)}\n`;
-
+    
             // 为每个结果创建一个按钮
             keyboard.push([{
-                text: `${index + 1}. ${title} (${year})`,
+                text: `${index + 1}. ${title} (${year} ${type}) ⭐️ ${item.vote_average.toFixed(1)}`,
                 callback_data: `/tmdb:${item.id}:${item.media_type}`
             }]);
-
+    
         });
-
+    
         const inlineKeyboard: InlineKeyboardMarkup = {
             inline_keyboard: keyboard
         };
+
+        await sendMessage(chatId, '🔍 请选择：', inlineKeyboard);
     
-        // 发送带有内联键盘的消息
-        await sendMessage(chatId, summaryMessage, { reply_markup: inlineKeyboard });
     } catch (error) {
         console.error('TMDB search error:', error);
         await sendMessage(chatId, '搜索时出错，请稍后重试');

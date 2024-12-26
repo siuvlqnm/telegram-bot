@@ -33,7 +33,7 @@ export async function handleCallbackQuery(callback_query: TelegramCallbackQuery,
         }
 
         // 处理TMDB搜索结果
-        if (data.startsWith('tmdb:')) {
+        if (data.startsWith('/tmdb:')) {
             await handleTMDBCallback(callback_query);
             return;
         }

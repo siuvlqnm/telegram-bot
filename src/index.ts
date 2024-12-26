@@ -17,6 +17,8 @@ app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
       const message = update.message;
       const callback_query = update.callback_query;
 
+      console.log(update);
+
       if (callback_query) {
          await handleCallbackQuery(callback_query, c.env.TELEGRAM_BOT_KV);
          return c.json({ message: 'OK' }, 200);

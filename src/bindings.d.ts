@@ -8,4 +8,5 @@ export interface Bindings {
     GOOGLE_API_KEY: string;
     TELEGRAM_BOT_KV: KVNamespace;
     TMDB_API_KEY: string;
+    MOONSHOT_API_KEY: string;
 }

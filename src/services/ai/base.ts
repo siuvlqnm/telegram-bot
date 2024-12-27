@@ -36,7 +36,7 @@ export class BaseAIService {
                         baseURL: this.client.baseURL,
                         requestParams: {
                             temperature: 0.7,
-                            max_tokens: 1000,
+                            max_tokens: 1024,
                             totalInputTokens: messages.reduce((acc, msg) => acc + msg.content.length, 0)
                         }
                     });
@@ -47,7 +47,7 @@ export class BaseAIService {
                             model: this.modelId,
                             messages: messages,
                             temperature: 0.7,
-                            max_tokens: 1000
+                            max_tokens: 1024
                         });
                         
                         const duration = Date.now() - startTime;

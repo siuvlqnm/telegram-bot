@@ -38,6 +38,12 @@ export const AI_PROVIDERS: Record<string, AIProvider> = {
         name: 'Gemini',
         description: '谷歌的 AI 模型',
         baseURL: 'https://generativelanguage.googleapis.com',
+    },
+    'moonshot': {
+        id: 'moonshot',
+        name: 'Moonshot',
+        description: 'Moonshot 的 AI 模型',
+        baseURL: 'https://api.moonshot.ai',
     }
 };
 
@@ -92,6 +98,13 @@ export const AI_MODELS: AIModel[] = [
         name: 'Gemini 2.0 Flash',
         description: '谷歌的 AI 模型'
     },
+    {
+        providerId: 'moonshot',
+        modelId: 'moonshot-v1-auto',
+        uniqueId: 'moonshot:moonshot-v1-auto',
+        name: 'Moonshot V1 Auto',
+        description: 'Moonshot 的 AI 模型'
+    }
 ];
 
 // AI 消息类型

@@ -19,4 +19,5 @@ export const DEEPSEEK_API_KEY = () => getConfig().DEEPSEEK_API_KEY;
 export const GOOGLE_API_KEY = () => getConfig().GOOGLE_API_KEY;
 export const TELEGRAM_BOT_KV = () => getConfig().TELEGRAM_BOT_KV;
 export const TMDB_API_KEY = () => getConfig().TMDB_API_KEY;
+export const MOONSHOT_API_KEY = () => getConfig().MOONSHOT_API_KEY;
 // 可以根据需要添加其他配置项的访问函数

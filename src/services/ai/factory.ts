@@ -1,7 +1,7 @@
 import { BaseAIService } from '@/services/ai/base';
 import { GoogleAIService } from '@/services/ai/google';
 import { getModelByUniqueId, getProviderById } from '@/types/ai';
-import { OPENROUTER_API_KEY, DEEPSEEK_API_KEY, GOOGLE_API_KEY } from '@/config';
+import { OPENROUTER_API_KEY, DEEPSEEK_API_KEY, GOOGLE_API_KEY, MOONSHOT_API_KEY } from '@/config';
 
 // API 密钥配置
 function getApiKey(providerId: string): string {
@@ -15,6 +15,9 @@ function getApiKey(providerId: string): string {
             break;
         case 'google':
             apiKey = GOOGLE_API_KEY();
+            break;
+        case 'moonshot':
+            apiKey = MOONSHOT_API_KEY();
             break;
     }
     return apiKey;

@@ -43,7 +43,7 @@ export const AI_PROVIDERS: Record<string, AIProvider> = {
         id: 'moonshot',
         name: 'Moonshot',
         description: 'Moonshot 的 AI 模型',
-        baseURL: 'https://api.moonshot.ai',
+        baseURL: 'https://api.moonshot.cn/v1',
     }
 };
 

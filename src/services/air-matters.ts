@@ -1,10 +1,14 @@
 import { AirQualityResponse, AirQualityLevel } from '@/types/air-matters';
 import { fetchApi } from '@/utils/api';
-
+import { AIR_MATTERS_API_KEY } from '@/config';
 export async function getAirQuality(): Promise<AirQualityResponse> {
     // https://api.air-matters.app/current_air_condition?place_id=b5f0a667&lang=en&standard=aqi_us
     const url = `https://api.air-matters.app/current_air_condition?place_id=ab4c5e07&lang=zh-Hans&standard=aqi_us`;
-    return await fetchApi<AirQualityResponse>(url);
+    return await fetchApi<AirQualityResponse>(url, {
+        headers: {
+            'Authorization': AIR_MATTERS_API_KEY()
+        }
+    });
 }
 
 export function formatAirQualityMessage(data: AirQualityResponse): string {
@@ -35,13 +39,13 @@ export function formatAirQualityMessage(data: AirQualityResponse): string {
     const levelEmoji = levelEmojis[aqi?.level as AirQualityLevel] || '❓';
 
     // 小红书风格的标题
-    const title = `${levelEmoji} 雨花区实时空气质量报告 ${levelEmoji}\n`;
+    const title = `${levelEmoji} 雨花区实时空气质量报告（美国标准） ${levelEmoji}\n`;
 
     // 主要空气质量指数部分
     const mainInfo = `
 🌈 空气质量指数(AQI)：${aqi?.value}
 📊 污染等级：${aqi?.level}
-🎨 指示颜色：${aqi?.color}
+🎨 指示颜色：${getColorName(aqi?.color)}
 
 `;
 
@@ -101,4 +105,27 @@ function getHealthAdvice(level: AirQualityLevel): string {
     };
     
     return advices[level] || '暂无具体建议，请根据实际情况做好防护。';
+}
+
+function getColorName(hexColor?: string): string {
+    if (!hexColor) return '未知';
+    
+    // 移除 # 号并转换为小写
+    const color = hexColor.replace('#', '').toLowerCase();
+    
+    // 将十六进制转换为 RGB
+    const r = parseInt(color.slice(0, 2), 16);
+    const g = parseInt(color.slice(2, 4), 16);
+    const b = parseInt(color.slice(4, 6), 16);
+    
+    // 判断颜色的主要成分
+    if (r > 200 && g > 200 && b < 100) return '🟡 黄色';
+    if (r > 200 && g < 150 && b < 100) return '🟠 橙色';
+    if (r > 200 && g < 100 && b < 100) return '🔴 红色';
+    if (r < 100 && g > 200 && b < 100) return '🟢 绿色';
+    if (r > 150 && g < 100 && b > 150) return '🟣 紫色';
+    if (r < 150 && g < 50 && b < 50) return '🟤 褐红色';
+    
+    // 如果无法判断，返回原始颜色值
+    return `🎨 ${hexColor}`;
 } 

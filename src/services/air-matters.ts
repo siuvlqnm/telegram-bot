@@ -39,7 +39,7 @@ export function formatAirQualityMessage(data: AirQualityResponse): string {
     const levelEmoji = levelEmojis[aqi?.level as AirQualityLevel] || '❓';
 
     // 小红书风格的标题
-    const title = `${levelEmoji} 雨花区实时空气质量报告（美国标准） ${levelEmoji}\n`;
+    const title = `${levelEmoji} 雨花区空气质量报告（美国标准） ${levelEmoji}\n`;
 
     // 主要空气质量指数部分
     const mainInfo = `

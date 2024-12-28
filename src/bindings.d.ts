@@ -9,4 +9,5 @@ export interface Bindings {
     TELEGRAM_BOT_KV: KVNamespace;
     TMDB_API_KEY: string;
     MOONSHOT_API_KEY: string;
+    AIR_MATTERS_API_KEY: string;
 }

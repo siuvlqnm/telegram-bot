@@ -1,4 +1,4 @@
-import { clearUserContext } from '@/contexts/chat-context';
+import { clearUserContext, getUserContextLength } from '@/contexts/chat-context';
 import { TELEGRAM_BOT_KV } from '@/config';
 import { sendMessage } from '@/utils/telegram';
 import { getUserState, setUserState } from '@/contexts/user-states';
@@ -8,8 +8,8 @@ import { showPromptSelection } from '@/handlers/prompt-selection';
 import { setUserPrompt, getUserPrompt } from '@/contexts/prompt-states';
 import { handleTMDBCommand } from '@/handlers/tmdb';
 import { getUserModel } from '@/contexts/model-states';
-import { AI_MODELS, getModelByUniqueId } from '@/types/ai';
-import { getUserContextLength } from '@/contexts/chat-context';
+import { getModelByUniqueId } from '@/types/ai';
+import { handleAirQualityCommand } from '@/handlers/air-quality';
 
 async function handleStatus(chatId: number) {
     const kv = TELEGRAM_BOT_KV();
@@ -24,10 +24,11 @@ async function handleStatus(chatId: number) {
         'AI': 'AI 对话模式',
         'CALC': '计算器模式',
         'TMDB': '影视搜索模式',
-        'MODEL': '模型选择模式'
+        'MODEL': '模型选择模式',
+        'AIR': '空气质量查询模式'
     };
 
-    const commandHelp = `📋 可用命令：\n\n/ai - 进入AI对话模式\n/calc - 进入计算器模式\n/tmdb - 搜索影视信息\n/model - 切换AI模型\n/prompt - 切换提示词模板\n/clear - 清除对话历史\n/status - 查看当前状态`;
+    const commandHelp = `📋 可用命令：\n\n/ai - 进入AI对话模式\n/calc - 进入计算器模式\n/tmdb - 搜索影视信息\n/model - 切换AI模型\n/prompt - 切换提示词模板\n/clear - 清除对话历史\n/air - 查询空气质量\n/status - 查看当前状态`;
 
     const statusMessage = `🤖 机器人当前状态：\n\n📱 当前模式：${state} (${stateDescriptions[state] || '未知状态'})\n🎯 当前模型：${model?.name || modelId}\n🏢 模型提供商：${model?.providerId || '未知'}\n📝 当前提示词：${promptId}\n💬 对话历史：${contextLength} 条消息\n${commandHelp}`;
 
@@ -74,6 +75,10 @@ export async function handleCommands(message: any) {
             return;
         case '/status':
             await handleStatus(chatId);
+            return;
+        case '/air':
+            await setUserState(TELEGRAM_BOT_KV(), chatId, 'IDLE');
+            await handleAirQualityCommand(chatId);
             return;
     }
 

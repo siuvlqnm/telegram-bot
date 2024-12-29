@@ -1,4 +1,5 @@
 import { AccuWeatherCurrentConditions, AccuWeatherForecast, AccuWeatherLocation } from '@/types/accuweather';
+import { fetchApi } from '@/utils/api';
 
 export class AccuWeatherService {
   private readonly apiKey: string;
@@ -8,41 +9,29 @@ export class AccuWeatherService {
     this.apiKey = apiKey;
   }
 
-// locations/v1/cities/geoposition/search 通过经纬度搜索
- async searchLocationByGeo(text: string): Promise<AccuWeatherLocation[]> {
+  // locations/v1/cities/geoposition/search 通过经纬度搜索
+  async searchLocationByGeo(text: string): Promise<AccuWeatherLocation> {
     const url = `${this.baseUrl}/locations/v1/cities/geoposition/search?apikey=${this.apiKey}&q=${text}&language=zh-cn`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`AccuWeather API error: ${response.statusText}`);
-    }
-    return response.json();
+    const response = await fetchApi<AccuWeatherLocation>(url);
+    return response;
   }
 
   async searchLocation(query: string): Promise<AccuWeatherLocation[]> {
     const url = `${this.baseUrl}/locations/v1/cities/search?apikey=${this.apiKey}&q=${encodeURIComponent(query)}&language=zh-cn`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`AccuWeather API error: ${response.statusText}`);
-    }
-    return response.json();
+    const response = await fetchApi<AccuWeatherLocation[]>(url);
+    return response;
   }
 
-  async getCurrentConditions(locationKey: string): Promise<AccuWeatherCurrentConditions[]> {
+  async getCurrentConditions(locationKey: string): Promise<AccuWeatherCurrentConditions> {
     const url = `${this.baseUrl}/currentconditions/v1/${locationKey}?apikey=${this.apiKey}&language=zh-cn&details=true`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`AccuWeather API error: ${response.statusText}`);
-    }
-    return response.json();
+    const response = await fetchApi<AccuWeatherCurrentConditions[]>(url);
+    return response[0];
   }
 
   async getForecast(locationKey: string): Promise<AccuWeatherForecast> {
     const url = `${this.baseUrl}/forecasts/v1/daily/5day/${locationKey}?apikey=${this.apiKey}&language=zh-cn&metric=true`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`AccuWeather API error: ${response.statusText}`);
-    }
-    return response.json();
+    const response = await fetchApi<AccuWeatherForecast>(url);
+    return response;
   }
 
   formatCurrentWeather(location: AccuWeatherLocation, current: AccuWeatherCurrentConditions): string {

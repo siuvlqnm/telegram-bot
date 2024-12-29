@@ -10,7 +10,7 @@ import { handleTMDBCommand } from '@/handlers/tmdb';
 import { getUserModel } from '@/contexts/model-states';
 import { getModelByUniqueId } from '@/types/ai';
 import { handleAirQualityCommand } from '@/handlers/air-quality';
-
+import { handleWeatherCommand } from '@/handlers/weather';
 async function handleStatus(chatId: number) {
     const kv = TELEGRAM_BOT_KV();
     const state = await getUserState(kv, chatId);
@@ -25,10 +25,11 @@ async function handleStatus(chatId: number) {
         'CALC': '计算器模式',
         'TMDB': '影视搜索模式',
         'MODEL': '模型选择模式',
-        'AIR': '空气质量查询模式'
+        'AIR': '空气质量查询模式',
+        'WEATHER': '天气查询模式'
     };
 
-    const commandHelp = `📋 可用命令：\n\n/ai - 进入AI对话模式\n/calc - 进入计算器模式\n/tmdb - 搜索影视信息\n/model - 切换AI模型\n/prompt - 切换提示词模板\n/clear - 清除对话历史\n/air - 查询空气质量\n/status - 查看当前状态`;
+    const commandHelp = `📋 可用命令：\n\n/ai - 进入AI对话模式\n/calc - 进入计算器模式\n/tmdb - 搜索影视信息\n/model - 切换AI模型\n/prompt - 切换提示词模板\n/clear - 清除对话历史\n/air - 查询空气质量\n/status - 查看当前状态\n/weather - 查询天气`;
 
     const statusMessage = `🤖 机器人当前状态：\n\n📱 当前模式：${state} (${stateDescriptions[state] || '未知状态'})\n🎯 当前模型：${model?.name || modelId}\n🏢 模型提供商：${model?.providerId || '未知'}\n📝 当前提示词：${promptId}\n💬 对话历史：${contextLength} 条消息\n${commandHelp}`;
 
@@ -80,6 +81,10 @@ export async function handleCommands(message: any) {
             await setUserState(TELEGRAM_BOT_KV(), chatId, 'IDLE');
             await handleAirQualityCommand(chatId);
             return;
+        case '/weather':
+            await setUserState(TELEGRAM_BOT_KV(), chatId, 'WEATHER');
+            await sendMessage(chatId, '请输入经纬度，例如：28.16700304429513,113.0402297055291');
+            return;
     }
 
     const currentState = await getUserState(TELEGRAM_BOT_KV(), chatId);
@@ -92,6 +97,9 @@ export async function handleCommands(message: any) {
             return;
         case 'TMDB':
             await handleTMDBCommand(chatId, text);
+            return;
+        case 'WEATHER':
+            await handleWeatherCommand(chatId, text);
             return;
         default:
             await handleStart(chatId);

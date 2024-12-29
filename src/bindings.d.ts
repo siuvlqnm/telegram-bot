@@ -10,4 +10,5 @@ export interface Bindings {
     TMDB_API_KEY: string;
     MOONSHOT_API_KEY: string;
     AIR_MATTERS_API_KEY: string;
+    ACCUWEATHER_API_KEY: string;
 }

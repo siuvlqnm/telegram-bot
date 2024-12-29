@@ -1,6 +1,6 @@
 import { TelegramCallbackQuery } from '@/types/telegram';
-import { showProviderModels, handleModelSelection, showProviderSelection } from '@/handlers/model-selection';
-import { sendMessage, deleteMessage } from '@/utils/telegram';
+import { showProviderModels, handleModelSelection } from '@/handlers/model-selection';
+import { sendMessage } from '@/utils/telegram';
 import { handlePromptSelection } from '@/handlers/prompt-selection';
 import { handleTMDBCallback } from '@/handlers/tmdb';
 

@@ -7,10 +7,10 @@ import { initializeConfig } from '@/config';
 import { handleCallbackQuery } from '@/handlers/callback';
 import { handleCommands } from '@/handlers/commands';
 
-const app = new Hono<{ Bindings: Bindings }>();
-app.use('/*', cors());
+const bot = new Hono<{ Bindings: Bindings }>();
+bot.use('/*', cors());
 
-app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
+bot.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
    initializeConfig(c.env);
    try {
       const update = c.req.valid('json');
@@ -34,4 +34,4 @@ app.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
    }
 });
 
-export default app;
+export default bot;

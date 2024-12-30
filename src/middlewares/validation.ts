@@ -1,5 +1,6 @@
 import { z } from 'zod';
-
+import { zValidator } from '@hono/zod-validator';
+import { Context, Next } from 'hono';
 // 基础用户信息 schema
 const userSchema = z.object({
     id: z.number(),
@@ -51,6 +52,24 @@ export const telegramUpdateSchema = z.object({
     message: messageSchema.optional(),
     callback_query: callbackQuerySchema.optional(),
 }).strict();
+
+// export const zValidator = (target: keyof ValidationTargets,  schema: ZodSchema) => 
+// zv(target, schema, (result, c) => {
+//   if (!result.success) {
+//     throw new HTTPException(400, { cause: result.error });
+//   }
+// })
+
+// // 验证middleware
+export const validateTelegramUpdate = (c: Context, next: Next) => {
+    const validator = zValidator('json', telegramUpdateSchema);
+    return validator(c, next);
+};
+
+// // 设置telegramUpdate
+// export const setTelegramUpdate = (c: Context, update: z.infer<typeof telegramUpdateSchema>) => {
+//     c.set('telegramUpdate', update);
+// };
 
 // // 验证middleware
 // export const validateTelegramUpdate: MiddlewareHandler = async (c, next) => {

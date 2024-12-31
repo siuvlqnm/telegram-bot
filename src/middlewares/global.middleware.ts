@@ -1,18 +1,13 @@
-// const config = require('../../config');
+import { Context, Next, MiddlewareHandler } from 'hono';
 
-// const telegramService = require('../services/telegram.service');
-// import { Context, Next } from 'hono';
-
-// const globalMiddleware = (ctx: Context, next: Next) => {
-//   // 全局验证：检查是否来自 Telegram
-//   if (ctx.req.header('content-type') !== 'application/json') {
-//     return ctx.text('Bad Request', 400);
-//   }
-
-//   // 全局赋值：将 Telegram 服务挂载到上下文
-//   ctx.state.telegram = telegramService;
-
-//   return next();
-// };
-
-// export default globalMiddleware;
+// 全局中间件
+export const globalMiddleware: MiddlewareHandler = async (c: Context, next: Next) => {
+    try {
+        const json = await c.req.json();
+        c.set('telegramUpdate', json);
+    } catch (error) {
+        console.error('Error parsing JSON:', error);
+        return c.text('Bad Request', 400);
+    }
+    return next();
+};

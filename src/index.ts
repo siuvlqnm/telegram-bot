@@ -1,20 +1,20 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { zValidator } from '@hono/zod-validator';
 import { Bindings } from '@/bindings';
+import { telegramUpdateSchema } from '@/middlewares/validation';
+import { initializeConfig } from '@/config';
 import { handleCallbackQuery } from '@/handlers/callback';
 import { handleCommands } from '@/handlers/commands';
-import { validateTelegramUpdate } from '@/middlewares/validation';
-import { globalMiddleware } from '@/middlewares/global.middleware';
 
 const bot = new Hono<{ Bindings: Bindings }>();
 bot.use('/*', cors());
 
-bot.use(validateTelegramUpdate);
-bot.use(globalMiddleware);
 
-bot.post('/', async (c) => {
+bot.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
+   initializeConfig(c.env);
    try {
-      const update = c.get('telegramUpdate');
+      const update = c.req.valid('json');
       const message = update.message;
       const callback_query = update.callback_query;
 

@@ -57,10 +57,22 @@ export const telegramUpdateSchema = z.object({
 export const validateTelegramUpdate: MiddlewareHandler = async (c: Context, next: Next) => {
     try {
         const validator = zValidator('json', telegramUpdateSchema);
-        return validator(c, next);
-        // await next();
+        await validator(c, next);
     } catch (err) {
-        console.error('Validation error:', err);
-        return c.json({ message: 'Invalid Telegram Update' }, 400);
+        if (err instanceof z.ZodError) {
+            // Zod 验证错误，包含详细的错误信息
+            console.error('Validation error:', err.errors);
+            return c.json({
+                message: 'Invalid Telegram Update',
+                errors: err.errors.map(e => ({
+                    path: e.path.join('.'),
+                    message: e.message
+                }))
+            }, 400);
+        }
+        
+        // 其他类型的错误
+        console.error('Unexpected error:', err);
+        return c.json({ message: 'Internal Server Error' }, 500);
     }
 };

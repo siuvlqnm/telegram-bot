@@ -68,7 +68,6 @@ export const validateTelegramUpdate: MiddlewareHandler = async (c: Context, next
                 }, 400);
             }
         });
-        
         // 调用 validator 中间件
         return validator(c, next);
     } catch (err) {

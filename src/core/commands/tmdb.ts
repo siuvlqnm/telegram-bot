@@ -11,9 +11,9 @@ export const startTmdbCommand = async (c: Context) => {
 };
 
 export const handleTmdbSearch = async (c: Context) => {
-  const update = c.get('telegram');
-  const text = update.message.text;
-  const chatId = update.message.chat.id;
+  const update = c.get('telegramUpdate');
+  const text = update.message?.text;
+  const chatId = update.message?.chat.id;
   const userStateService = c.env.USER_STATE_SERVICE;
 
   try {
@@ -71,6 +71,10 @@ const handleTmdbItemDetails = async (c: Context, itemId: number, mediaType: 'mov
     let responseText = `🎬 ${movieDetails.title} (${movieDetails.release_date})`;
     responseText += `\n⭐️ 评分: ${movieDetails.vote_average.toFixed(1)}`;
     responseText += `\n📝 简介: ${movieDetails.overview || '暂无简介'}`;
+    const telegramService = c.get('telegramService');
+    const update = c.get('telegramUpdate');
+    const chatId = update.message?.chat.id;
+    telegramService.sendMessage(chatId, responseText);
     return c.text(responseText);
   }
   if (mediaType === 'tv') {

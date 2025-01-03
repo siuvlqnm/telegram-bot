@@ -1,7 +1,7 @@
 // src/services/tmdb.ts
 import axios from 'axios';
 
-interface multiSearchResult {
+export interface multiSearchResult {
     results: Array<{
         // 基础信息
         id: number;                    // 条目ID
@@ -34,30 +34,30 @@ interface multiSearchResult {
     }>;
 }
 
-interface TmdbGenre {
+export interface TmdbGenre {
     id: number;           // 类型ID
     name: string;         // 类型名称
 }
 
-interface TmdbProductionCompany {
+export interface TmdbProductionCompany {
     id: number;           // 公司ID
     logo_path?: string;   // 公司logo路径
     name: string;         // 公司名称
     origin_country: string; // 公司所属国家
 }
 
-interface TmdbProductionCountry {
+export interface TmdbProductionCountry {
     iso_3166_1: string;  // 国家代码
     name: string;        // 国家名称
 }
 
-interface TmdbSpokenLanguage {
+export interface TmdbSpokenLanguage {
     english_name: string; // 英文名称
     iso_639_1: string;   // 语言代码
     name: string;        // 本地语言名称
 }
 
-interface TmdbMovieDetail {
+export interface TmdbMovieDetail {
     // 基础信息
     id: number;                     // 电影ID
     title: string;                  // 电影标题
@@ -94,7 +94,7 @@ interface TmdbMovieDetail {
     spoken_languages: TmdbSpokenLanguage[];          // 对白语言
 }
 
-interface TmdbCreator {
+export interface TmdbCreator {
     id: number;           // 创作者ID
     credit_id: string;    // 演职人员ID
     name: string;         // 创作者名称
@@ -102,7 +102,7 @@ interface TmdbCreator {
     profile_path?: string; // 个人头像路径
 }
 
-interface TmdbEpisodeBase {
+export interface TmdbEpisodeBase {
     id: number;                // 剧集ID
     name: string;              // 剧集名称
     overview: string;          // 剧情简介
@@ -117,14 +117,14 @@ interface TmdbEpisodeBase {
     still_path?: string;      // 剧集截图路径
 }
 
-interface TmdbNetwork {
+export interface TmdbNetwork {
     id: number;           // 网络ID
     logo_path?: string;   // 网络logo路径
     name: string;         // 网络名称
     origin_country: string; // 所属国家
 }
 
-interface TmdbSeason {
+export interface TmdbSeason {
     air_date?: string;        // 播出日期
     episode_count: number;    // 集数，默认 0
     id: number;              // 季ID
@@ -135,7 +135,7 @@ interface TmdbSeason {
     vote_average: number;    // 平均评分，默认 0
 }
 
-interface TmdbShowDetail {
+export interface TmdbShowDetail {
     // 基础信息
     id: number;                     // 剧集ID
     name: string;                   // 剧集名称
@@ -228,6 +228,7 @@ export class TmdbService {
       const response = await axios.get(`${this.baseUrl}/movie/${movieId}`, {
         params: {
           api_key: this.apiKey,
+          language: 'zh-CN',
         },
       });
       return response.data;
@@ -257,6 +258,7 @@ export class TmdbService {
       const response = await axios.get(`${this.baseUrl}/tv/${showId}`, {
         params: {
           api_key: this.apiKey,
+          language: 'zh-CN',
         },
       });
       return response.data;
@@ -271,6 +273,7 @@ export class TmdbService {
       const response = await axios.get(`${this.baseUrl}/tv/${showId}/seasons`, {
         params: {
           api_key: this.apiKey,
+          language: 'zh-CN',
         },
       });
       return response.data.seasons;

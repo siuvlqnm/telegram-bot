@@ -12,7 +12,7 @@ export function registerCommands(registry: CommandRegistry) {
     registry.register({
       name: 'tmdb',
       description: 'tmdb命令',
-      handler: TmdbCommand.tmdbCommand,
+      handler: TmdbCommand.startTmdbCommand,
     });
     
     // registry.register({

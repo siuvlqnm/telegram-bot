@@ -7,32 +7,39 @@ import { initializeConfig } from '@/config';
 import { handleCallbackQuery } from '@/handlers/callback';
 import { handleCommands } from '@/handlers/commands';
 
-const bot = new Hono<{ Bindings: Bindings }>();
-bot.use('/*', cors());
+import bot from '@/core/bot';
 
 
-bot.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
-   initializeConfig(c.env);
-   try {
-      const update = c.req.valid('json');
-      const message = update.message;
-      const callback_query = update.callback_query;
+const app = new Hono();
 
-      if (callback_query) {
-         await handleCallbackQuery(callback_query, c.env.TELEGRAM_BOT_KV);
-         return c.json({ message: 'OK' }, 200);
-      }
-      if (!message) {
-         return c.json({ message: 'Invalid Telegram Update' }, 400);
-      }
-      if (message?.text) {
-         await handleCommands(message);
-      }
-      return c.json({ message: 'OK' }, 200);
-   } catch (error) {
-      console.error('Error processing update:', error);
-      return c.json({ message: 'Error processing update' }, 500);
-   }
-});
+app.route('/', bot);
+
+// const bot = new Hono<{ Bindings: Bindings }>();
+// bot.use('/*', cors());
+
+
+// bot.post('/', zValidator('json', telegramUpdateSchema), async (c) => {
+//    initializeConfig(c.env);
+//    try {
+//       const update = c.req.valid('json');
+//       const message = update.message;
+//       const callback_query = update.callback_query;
+
+//       if (callback_query) {
+//          await handleCallbackQuery(callback_query, c.env.TELEGRAM_BOT_KV);
+//          return c.json({ message: 'OK' }, 200);
+//       }
+//       if (!message) {
+//          return c.json({ message: 'Invalid Telegram Update' }, 400);
+//       }
+//       if (message?.text) {
+//          await handleCommands(message);
+//       }
+//       return c.json({ message: 'OK' }, 200);
+//    } catch (error) {
+//       console.error('Error processing update:', error);
+//       return c.json({ message: 'Error processing update' }, 500);
+//    }
+// });
 
 export default bot;

@@ -38,6 +38,7 @@ export const logger: MiddlewareHandler = async (c: Context, next: Next) => {
   await next();
 
   // 记录响应时间
-  const duration = Date.now() - startTime;
+  const endTime = Date.now() + timezoneOffset;
+  const duration = endTime - startTime;
   console.log(`[${new Date(startTime).toISOString()}] ✅ Completed in ${duration}ms`);
 };

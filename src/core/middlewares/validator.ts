@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Context, Next, MiddlewareHandler } from 'hono';
 // 基础用户信息 schema
 const userSchema = z.object({
-    id: z.number().refine((id) => id === 1927888323, { message: '未授权用户' }), // 用户ID
+    id: z.number(), // 用户ID
     is_bot: z.boolean(), // 是否是机器人
     first_name: z.string(), // 用户名
     last_name: z.string().optional(), // 用户姓

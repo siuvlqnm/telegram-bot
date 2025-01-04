@@ -4,6 +4,7 @@ import { Context } from 'hono';
 export const handleTmdbItemDetailsCallback = async (c: Context) => {
   const callbackQuery = c.get('telegramUpdate').callback_query;
   const data = callbackQuery?.data; // 假设 callback_data 包含类似 "movie_details:123" 的信息
+  const chatId = callbackQuery?.message?.chat.id;
   const [_, itemId, mediaType] = data?.split(':') || [];
   const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w500';
   if (mediaType === 'movie') {
@@ -17,8 +18,6 @@ export const handleTmdbItemDetailsCallback = async (c: Context) => {
       responseText += `🖼️ 海报: ${POSTER_BASE_URL}${movieDetails.poster_path}\n`;
       responseText += `📝 简介: ${movieDetails.overview || '暂无简介'}`;
       const telegramService = c.get('telegramService');
-      const update = c.get('telegramUpdate');
-      const chatId = update.message?.chat.id;
       telegramService.sendMessage(chatId, responseText);
       return c.text(`🎬 ${movieDetails.title} 已发送`);
     } catch (error) {

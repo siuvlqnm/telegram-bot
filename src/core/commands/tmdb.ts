@@ -14,7 +14,7 @@ export const handleTmdbSearch = async (c: Context) => {
   const update = c.get('telegramUpdate');
   const text = update.message?.text;
   const chatId = update.message?.chat.id;
-  const userStateService = c.env.USER_STATE_SERVICE;
+  const userStateService = c.get('userStateService');
 
   try {
     const tmdbService = c.get('tmdbService');

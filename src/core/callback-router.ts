@@ -8,7 +8,7 @@ const callbackHandlers: Record<string, (c: Context) => Promise<Response> | Respo
 };
 
 export const handleCallbackQuery = async (c: Context) => {
-  const update = await c.req.json();
+  const update = c.get('telegramUpdate');
   const callbackQuery = update.callback_query;
 
   if (callbackQuery && callbackQuery.data) {

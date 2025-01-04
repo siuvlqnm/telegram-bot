@@ -16,7 +16,7 @@ bot.use(globalAssigner);
 CommandLoader.registerCommands(commandRegistry);
 
 // 处理 Telegram Webhook
-bot.post('/t-w', async (c: Context) => {
+bot.post('/', async (c: Context) => {
   const update = c.get('telegramUpdate');
   const text = update.message?.text;
   const chatId = update.message?.chat.id;

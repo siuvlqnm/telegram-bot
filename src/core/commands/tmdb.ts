@@ -3,11 +3,24 @@ import { Context } from 'hono';
 import { InlineKeyboardButton, InlineKeyboardMarkup } from '@/types/telegram';
 
 export const startTmdbCommand = async (c: Context) => {
-  const chatId = c.req.param('chatId');
-  const userStateService = c.env.USER_STATE_SERVICE;
+  const update = c.get('telegramUpdate');
+  const text = update.message?.text;
 
-  await userStateService.updateState(chatId, { currentIntent: 'tmdb_search' });
-  return c.text('好的，请输入电影或剧集名称。');
+  const isCommand = text?.startsWith('/tmdb');
+
+  if (isCommand) {
+    const telegramService = c.get('telegramService');
+    const chatId = update.message?.chat.id;
+    telegramService.sendMessage(chatId, '😁 请输入电影或剧集名称。');
+    return c.text('😁 请输入电影或剧集名称。');
+  }
+  // const searchText = isCommand ? text?.substring(5) : text;
+
+  // if (!searchText) {
+  //   return c.text('请输入你的问题。');
+  // }
+  handleTmdbSearch(c)
+  return c.json({ message: '😁 请输入电影或剧集名称。' }, 200);
 };
 
 export const handleTmdbSearch = async (c: Context) => {

@@ -5,22 +5,16 @@ import { InlineKeyboardButton, InlineKeyboardMarkup } from '@/types/telegram';
 export const startTmdbCommand = async (c: Context) => {
   const update = c.get('telegramUpdate');
   const text = update.message?.text;
-
   const isCommand = text?.startsWith('/tmdb');
-
   if (isCommand) {
     const telegramService = c.get('telegramService');
     const chatId = update.message?.chat.id;
-    telegramService.sendMessage(chatId, '😁 请输入电影或剧集名称。');
+    
+    await telegramService.sendMessage(chatId, '😁 请输入电影或剧集名称。');
     return c.text('😁 请输入电影或剧集名称。');
   }
-  // const searchText = isCommand ? text?.substring(5) : text;
-
-  // if (!searchText) {
-  //   return c.text('请输入你的问题。');
-  // }
-  handleTmdbSearch(c)
-  return c.json({ message: '😁 请输入电影或剧集名称。' }, 200);
+  await handleTmdbSearch(c);
+  return c.text('😁 已发送');
 };
 
 export const handleTmdbSearch = async (c: Context) => {

@@ -48,9 +48,8 @@ export const handleTmdbSearch = async (c: Context) => {
             // 为每个结果创建一个按钮
             keyboard.push([{
                 text: `${index + 1}. ${title} (${year} ${type}) ⭐️ ${item.vote_average.toFixed(1)}`,
-                callback_data: `tmdb_details:${item.id}:${item.media_type}`
+                callback_data: `${item.media_type}_details:${item.id}`
             }]);
-    
         });
     
     const inlineKeyboard: InlineKeyboardMarkup = {
@@ -67,6 +66,9 @@ export const handleTmdbSearch = async (c: Context) => {
 const handleTmdbItemDetails = async (c: Context, itemId: number, mediaType: 'movie' | 'tv') => {
   const tmdbService = c.get('tmdbService');
   const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+  const telegramService = c.get('telegramService');
+  const update = c.get('telegramUpdate');
+  const chatId = update.message?.chat.id;
   if (mediaType === 'movie') {
     const movieDetails = await tmdbService.getMovieDetails(itemId);
     let responseText = `🎬 ${movieDetails.title}\n`;
@@ -75,28 +77,31 @@ const handleTmdbItemDetails = async (c: Context, itemId: number, mediaType: 'mov
     responseText += `🏷️ 类型: ${movieDetails.genres.map((g: any) => g.name).join('、')}\n`;
     responseText += `🖼️ 海报: ${POSTER_BASE_URL}${movieDetails.poster_path}\n`;
     responseText += `📝 简介: ${movieDetails.overview || '暂无简介'}`;
-    const telegramService = c.get('telegramService');
-    const update = c.get('telegramUpdate');
-    const chatId = update.message?.chat.id;
-    telegramService.sendMessage(chatId, responseText);
+    await telegramService.sendMessage(chatId, responseText);
     return c.text(`🎬 ${movieDetails.title} 已发送`);
   }
   if (mediaType === 'tv') {
     const showDetails = await tmdbService.getShowDetails(itemId);
-    const seasons = await tmdbService.getShowSeasons(itemId);
-    const inlineKeyboard: InlineKeyboardMarkup = {
-      inline_keyboard: seasons.map((season: any) => [
-        {
-          text: `第 ${season.season_number} 季 (${season.episode_count} 集)`,
-          callback_data: `tmdb_seasons:${itemId}:${season.season_number}`,
-        },
-      ]),
-    };
-    return c.json({
-      method: 'sendMessage',
-      chat_id: c.req.param('chatId'),
-      text: `**📺 ${showDetails.name}**\n请选择季：`,
-      reply_markup: inlineKeyboard,
+    let responseText = `*📺 ${showDetails.name}*\n`;
+    responseText += `📅 首播日期: ${showDetails.first_air_date ? new Date(showDetails.first_air_date).toLocaleDateString('zh-CN') : '未知'}\n`;
+    responseText += `⭐️ 评分: ${showDetails.vote_average.toFixed(1)}\n`;
+    responseText += `🏷️ 类型: ${showDetails.genres.map((g: any) => g.name).join('、')}\n`;
+    responseText += `🖼️ 海报: ${POSTER_BASE_URL}${showDetails.poster_path}\n`;
+    responseText += `📝 简介: ${showDetails.overview || '暂无简介'}\n\n`;
+    responseText += `🎬 请选择季：`;
+
+    // 上面部分展示剧集详情，下面部分展示剧集季数，并提供选择季数的功能
+    const keyboard: InlineKeyboardButton[][] = [];
+    showDetails.seasons.map((season: any) => {
+        keyboard.push([{
+            text: `${season.name} (${season.air_date ? new Date(season.air_date).toLocaleDateString('zh-CN') : '未知'})`,
+            callback_data: `tmdb_seasons:${itemId}:${season.season_number}`
+        }]);
     });
+    const inlineKeyboard: InlineKeyboardMarkup = {
+        inline_keyboard: keyboard
+    };
+    await telegramService.sendMessage(chatId, responseText, { reply_markup: inlineKeyboard, parse_mode: 'MarkdownV2' });
+    return c.text(`📺 ${showDetails.name} 已发送`);
   }
 };

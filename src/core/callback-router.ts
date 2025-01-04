@@ -3,7 +3,8 @@ import { Context } from 'hono';
 import * as TmdbCallbacks from '@/callbacks/tmdb';
 
 const callbackHandlers: Record<string, (c: Context) => Promise<Response> | Response> = {
-  'tmdb_details': TmdbCallbacks.handleTmdbItemDetailsCallback,
+  'movie_details': TmdbCallbacks.handleTmdbMovieDetailsCallback,
+  'tv_details': TmdbCallbacks.handleTmdbTvDetailsCallback,
   // ... 其他 callback 类型
 };
 

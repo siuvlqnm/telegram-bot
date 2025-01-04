@@ -21,9 +21,14 @@ CommandLoader.registerCommands(commandRegistry);
 // 处理 Telegram Webhook
 bot.post('/', async (c: Context) => {
   const update = c.get('telegramUpdate');
+  const callbackQuery = update.callback_query;
+
+  if (callbackQuery) {
+    return handleCallbackQuery(c);
+  }
+  
   const text = update.message?.text;
   const chatId = update.message?.chat.id;
-  const callbackQuery = update.callback_query;
   const userStateService = c.get('userStateService');
   const telegramService = c.get('telegramService');
 
@@ -36,10 +41,6 @@ bot.post('/', async (c: Context) => {
     await userStateService.clearState(chatId);
     await telegramService.sendMessage(chatId, '🧹 会话状态已清除。');
     return c.text('🧹 会话状态已清除。');
-  }
-
-  if (callbackQuery) {
-    return handleCallbackQuery(c);
   }
 
   if (text.startsWith('/')) {

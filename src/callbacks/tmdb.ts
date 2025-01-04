@@ -11,7 +11,7 @@ export const handleTmdbItemDetailsCallback = async (c: Context) => {
     try {
       const tmdbService = c.get('tmdbService');
       const movieDetails = await tmdbService.getMovieDetails(itemId);
-      let responseText = `🎬 ${movieDetails.title} (电影)\n`;
+      let responseText = `🎬 ${movieDetails.title}\n`;
       responseText += `📅 上映日期: ${movieDetails.release_date ? new Date(movieDetails.release_date).toLocaleDateString('zh-CN') : '未知'}\n`;
       responseText += `⭐️ 评分: ${movieDetails.vote_average.toFixed(1)}\n`;
       responseText += `🏷️ 类型: ${movieDetails.genres.map((g: any) => g.name).join('、')}\n`;

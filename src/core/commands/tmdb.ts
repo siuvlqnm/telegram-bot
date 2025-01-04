@@ -69,7 +69,7 @@ const handleTmdbItemDetails = async (c: Context, itemId: number, mediaType: 'mov
   const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w500';
   if (mediaType === 'movie') {
     const movieDetails = await tmdbService.getMovieDetails(itemId);
-    let responseText = `🎬 ${movieDetails.title} (电影)\n`;
+    let responseText = `🎬 ${movieDetails.title}\n`;
     responseText += `📅 上映日期: ${movieDetails.release_date ? new Date(movieDetails.release_date).toLocaleDateString('zh-CN') : '未知'}\n`;
     responseText += `⭐️ 评分: ${movieDetails.vote_average.toFixed(1)}\n`;
     responseText += `🏷️ 类型: ${movieDetails.genres.map((g: any) => g.name).join('、')}\n`;

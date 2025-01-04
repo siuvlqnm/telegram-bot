@@ -21,7 +21,6 @@ export const handleTmdbSearch = async (c: Context) => {
   const update = c.get('telegramUpdate');
   const text = update.message?.text;
   const chatId = update.message?.chat.id;
-  const userStateService = c.get('userStateService');
 
   try {
     const tmdbService = c.get('tmdbService');
@@ -54,20 +53,14 @@ export const handleTmdbSearch = async (c: Context) => {
     
         });
     
-        const inlineKeyboard: InlineKeyboardMarkup = {
-            inline_keyboard: keyboard
-        };
-      return c.json({
-        method: 'sendMessage',
-        chat_id: chatId,
-        text: '找到以下匹配项，请选择：',
-        reply_markup: inlineKeyboard,
-      });
+    const inlineKeyboard: InlineKeyboardMarkup = {
+        inline_keyboard: keyboard
+    };
+    await telegramService.sendMessage(chatId, '🎬 找到以下匹配项，请选择：', { reply_markup: inlineKeyboard });
+    return c.text('🎬 找到以下匹配项，请选择：');
   } catch (error) {
     console.error('TMDB 查询失败:', error);
     return c.text('查询 TMDB 时出错。', 500);
-  } finally {
-    await userStateService.updateState(chatId, { currentIntent: undefined }); // 清除状态
   }
 };
 

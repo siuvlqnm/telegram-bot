@@ -1,11 +1,11 @@
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
-import { zValidator } from '@hono/zod-validator';
-import { Bindings } from '@/bindings';
-import { telegramUpdateSchema } from '@/middlewares/validation';
-import { initializeConfig } from '@/config';
-import { handleCallbackQuery } from '@/handlers/callback';
-import { handleCommands } from '@/handlers/commands';
+// import { cors } from 'hono/cors';
+// import { zValidator } from '@hono/zod-validator';
+// import { Bindings } from '@/bindings';
+// import { telegramUpdateSchema } from '@/middlewares/validation';
+// import { initializeConfig } from '@/config';
+// import { handleCallbackQuery } from '@/handlers/callback';
+// import { handleCommands } from '@/handlers/commands';
 
 import bot from '@/core/bot';
 

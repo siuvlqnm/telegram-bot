@@ -24,6 +24,21 @@ export class TelegramService {
     }
   }
 
+  async editMessageText(chatId: number, messageId: number, text: string, options?: any) {
+    try {
+      const response = await axios.post(`${this.apiUrl}/editMessageText`, {
+        chat_id: chatId,
+        message_id: messageId,
+        text: text,
+        ...options,
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('编辑消息失败:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
   async sendPhoto(chatId: number, photo: string, options?: any) {
     try {
       const response = await axios.post(`${this.apiUrl}/sendPhoto`, {

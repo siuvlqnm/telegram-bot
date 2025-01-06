@@ -89,7 +89,7 @@ export class AIModule {
             }
         } else {
             // 如果没有 function_call，则认为是闲聊
-            const chatResponse = JSON.parse(response).choices[0]?.message?.content;
+            const chatResponse = message.choices[0]?.message?.content;
             if (chatResponse) {
                 await telegramService.sendMessage(chatId, chatResponse);
             } else {

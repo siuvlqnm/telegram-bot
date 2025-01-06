@@ -53,14 +53,14 @@ bot.post('/', async (c: Context) => {
           await telegramService.sendMessage(chatId, '🚫 未知命令');
           return c.text('🚫 未知命令');
         }
-      } else {
-        // 处理非命令消息，尝试使用之前的意图
-        if (text) {
-            const aiModule = c.get('aiModule');
-            await aiModule.processUserMessage(c);
-        }
-        return c.text('🚫 请发送一个命令。');
-      }
+  } else {
+    // 处理非命令消息，尝试使用之前的意图
+    if (text) {
+        const aiModule = c.get('aiModule');
+        await aiModule.processUserMessage(c);
+    }
+    return c.text('🚫 请发送一个命令。');
+  }
 
 //   if (text.startsWith('/')) {
 //     const commandName = text.substring(1).split(' ')[0];

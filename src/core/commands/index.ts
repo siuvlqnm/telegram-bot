@@ -6,6 +6,12 @@ import * as ProviderCommand from '@/core/commands/provider';
 import * as ModelCommand from '@/core/commands/model';
 // export * as AskCommand from './ask';
 
+// 命令介绍中加入emojis，要根据命令的用途来决定emojis
+// start - 🤖 开始命令
+// setprovider - 🤖 设置AI提供商
+// setmodel - 🤖 设置AI模型
+// clear - 🧹 清除当前会话状态
+
 export function registerCommands(registry: CommandRegistry) {
     registry.register({
       name: 'start',

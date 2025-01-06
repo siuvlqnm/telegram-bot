@@ -24,6 +24,18 @@ export class AIModule {
         return this.providers.get(providerId);
     }
 
+    async listAvailableProviders(): Promise<{ id: string; name: string }[]> {
+        return Array.from(this.providers.values()).map(provider => ({ id: provider.id, name: provider.name }));
+    }
+
+    async listModels(providerId: string): Promise<string[]> {
+        const provider = this.getProvider(providerId);
+        if (!provider) {
+            throw new Error(`Provider '${providerId}' not found.`);
+        }
+        return provider.listModels();
+    }
+
     async processUserMessage(c: Context) {
         // 1. 选择合适的 AI 提供商和模型 (可以从用户状态获取)
         const update = c.get('telegramUpdate');

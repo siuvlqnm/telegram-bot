@@ -48,14 +48,14 @@ export class AIModule {
         const userState = await userStateService.getState(chatId);
         const providerId = userState.preferredModelProvider;
         const model = userState.preferredModel;
-        const provider = this.getProvider(providerId);
+        const provider = this.getProvider('deepseek');
         if (!provider) {
             console.error(`Provider '${providerId}' not found.`);
             return;
         }
 
         // 2. 调用 AI 模型进行意图识别和参数提取 (使用 Function Calling 或其他方法)
-        const response = await provider.generateText(text, model, {
+        const response = await provider.generateText(text, 'deepseek-chat', {
             functions: [
                 {
                     name: 'get_weather',
@@ -72,30 +72,35 @@ export class AIModule {
             function_call: 'auto',
         });
 
-        const message = JSON.parse(response).choices[0]?.message;
-
-
         const telegramService = c.get('telegramService');
-        if (message?.function_call) {
-            const intent = message.function_call.name;
-            const params = JSON.parse(message.function_call.arguments || '{}');
 
-            const taskHandler = getTaskHandler(intent);
-            if (taskHandler) {
-                await taskHandler(c, params);
-            } else {
-                console.warn(`No task handler registered for intent: ${intent}`);
-                await telegramService.sendMessage(chatId, "我不确定如何处理您的请求。");
-            }
+        if (response) {
+            await telegramService.sendMessage(chatId, response);
         } else {
-            // 如果没有 function_call，则认为是闲聊
-            const chatResponse = message.choices[0]?.message?.content;
-            if (chatResponse) {
-                await telegramService.sendMessage(chatId, chatResponse);
-            } else {
-                console.warn('未收到 AI 的聊天回复:', response);
-                await telegramService.sendMessage(chatId, "抱歉，我没有理解您的意思。");
-            }
+            console.warn('未收到 AI 的聊天回复:', response);
+            await telegramService.sendMessage(chatId, "抱歉，我没有理解您的意思。");
         }
+
+        // if (response?.function_call) {
+        //     const intent = response.function_call.name;
+        //     const params = JSON.parse(response.function_call.arguments || '{}');
+
+        //     const taskHandler = getTaskHandler(intent);
+        //     if (taskHandler) {
+        //         await taskHandler(c, params);
+        //     } else {
+        //         console.warn(`No task handler registered for intent: ${intent}`);
+        //         await telegramService.sendMessage(chatId, "我不确定如何处理您的请求。");
+        //     }
+        // } else {
+        //     // 如果没有 function_call，则认为是闲聊
+        //         // const chatResponse = response.choices[0]?.message?.content;
+        //     if (response) {
+        //         await telegramService.sendMessage(chatId, response);
+        //     } else {
+        //         console.warn('未收到 AI 的聊天回复:', response);
+        //         await telegramService.sendMessage(chatId, "抱歉，我没有理解您的意思。");
+        //     }
+        // }
     }
 }

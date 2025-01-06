@@ -2,6 +2,8 @@
 export interface UserState {
   currentIntent?: string;
   // 其他状态属性
+  preferredModelProvider?: string;
+  preferredModel?: string;
   [key: string]: any;
 }
 

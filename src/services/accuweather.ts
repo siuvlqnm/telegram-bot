@@ -1,5 +1,5 @@
 import { AccuWeatherCurrentConditions, AccuWeatherForecast, AccuWeatherLocation } from '@/types/accuweather';
-import { fetchApi } from '@/utils/api';
+import axios from 'axios';
 
 export class AccuWeatherService {
   private readonly apiKey: string;
@@ -12,26 +12,26 @@ export class AccuWeatherService {
   // locations/v1/cities/geoposition/search 通过经纬度搜索
   async searchLocationByGeo(text: string): Promise<AccuWeatherLocation> {
     const url = `${this.baseUrl}/locations/v1/cities/geoposition/search?apikey=${this.apiKey}&q=${text}&language=zh-cn`;
-    const response = await fetchApi<AccuWeatherLocation>(url);
-    return response;
+    const response = await axios.get<AccuWeatherLocation>(url);
+    return response.data;
   }
 
   async searchLocation(query: string): Promise<AccuWeatherLocation[]> {
     const url = `${this.baseUrl}/locations/v1/cities/search?apikey=${this.apiKey}&q=${encodeURIComponent(query)}&language=zh-cn`;
-    const response = await fetchApi<AccuWeatherLocation[]>(url);
-    return response;
+    const response = await axios.get<AccuWeatherLocation[]>(url);
+    return response.data;
   }
 
   async getCurrentConditions(locationKey: string): Promise<AccuWeatherCurrentConditions> {
     const url = `${this.baseUrl}/currentconditions/v1/${locationKey}?apikey=${this.apiKey}&language=zh-cn&details=true`;
-    const response = await fetchApi<AccuWeatherCurrentConditions[]>(url);
-    return response[0];
+    const response = await axios.get<AccuWeatherCurrentConditions[]>(url);
+    return response.data[0];
   }
 
   async getForecast(locationKey: string): Promise<AccuWeatherForecast> {
     const url = `${this.baseUrl}/forecasts/v1/daily/5day/${locationKey}?apikey=${this.apiKey}&language=zh-cn&metric=true`;
-    const response = await fetchApi<AccuWeatherForecast>(url);
-    return response;
+    const response = await axios.get<AccuWeatherForecast>(url);
+    return response.data;
   }
 
   formatCurrentWeather(location: AccuWeatherLocation, current: AccuWeatherCurrentConditions): string {

@@ -1,5 +1,5 @@
 import { OpenAI } from 'openai';
-import { AIProvider } from './ai-provider';
+import { AIProvider, AIResponse } from './ai-provider';
 import { Context } from 'hono';
 
 // baseURL: https://api.deepseek.com
@@ -25,7 +25,7 @@ export class DeepSeekProvider implements AIProvider {
         return models.data.map(model => model.id);
     }
 
-    async generateText(prompt: string, model: string, options?: OpenAI.Chat.ChatCompletionCreateParams): Promise<string> {
+    async generateText(prompt: string, model: string, options?: OpenAI.Chat.ChatCompletionCreateParams): Promise<AIResponse> {
         if (!this.deepseek) {
             throw new Error('DeepSeek client not initialized');
         }
@@ -34,18 +34,38 @@ export class DeepSeekProvider implements AIProvider {
             const completion = await this.deepseek.chat.completions.create({
                 model: model,
                 messages: [{ role: 'user', content: prompt }],
-                stream: false, // 确保不使用流式传输，获取完整的 ChatCompletion
+                stream: false,
                 ...options,
             });
 
             if ('choices' in completion && completion.choices && completion.choices.length > 0) {
-                return completion.choices[0].message?.content || '';
+                const choice = completion.choices[0];
+                
+                // 如果存在 function_call，返回函数调用结果
+                if (choice.message?.tool_calls) {
+                    return {
+                        type: 'tool_calls',
+                        content: {
+                            name: choice.message.tool_calls[0].function.name,
+                            arguments: JSON.parse(choice.message.tool_calls[0].function.arguments || '{}')
+                        }
+                    };
+                }
+                
+                // 否则返回普通文本
+                return {
+                    type: 'text',
+                    content: choice.message?.content || ''
+                };
             } else {
-                console.error('OpenAI 返回的 completion 中没有 choices 属性:', completion);
-                return '';
+                console.error('DeepSeek 返回的 completion 中没有 choices 属性:', completion);
+                return {
+                    type: 'text',
+                    content: ''
+                };
             }
         } catch (error) {
-            console.error('调用 OpenAI API 失败:', error);
+            console.error('调用 DeepSeek API 失败:', error);
             throw error;
         }
     }

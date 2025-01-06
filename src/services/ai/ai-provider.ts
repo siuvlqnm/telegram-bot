@@ -1,6 +1,16 @@
 // src/services/ai-provider.ts
 import { Context } from 'hono';
 
+export type AIResponse = {
+    type: 'text';
+    content: string;
+} | {
+    type: 'tool_calls';
+    content: {
+        name: string;
+        arguments: Record<string, any>;
+    };
+};
 
 export interface AIProvider {
     id: string; // 唯一标识符 (例如: 'openai', 'gemini')
@@ -13,7 +23,7 @@ export interface AIProvider {
     listModels(): Promise<string[]>;
 
     // 生成文本
-    generateText(prompt: string, model: string, options?: any): Promise<string>;
+    generateText(prompt: string, model: string, options?: any): Promise<AIResponse>;
 
     // 其他可能需要的接口，例如：
     // generateImage(prompt: string, model: string, options?: any): Promise<string>;

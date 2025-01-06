@@ -48,59 +48,67 @@ export class AIModule {
         const userState = await userStateService.getState(chatId);
         const providerId = userState.preferredModelProvider;
         const model = userState.preferredModel;
-        const provider = this.getProvider('deepseek');
+        const provider = this.getProvider(providerId);
         if (!provider) {
             console.error(`Provider '${providerId}' not found.`);
             return;
         }
 
-        // 2. 调用 AI 模型进行意图识别和参数提取 (使用 Function Calling 或其他方法)
-        const response = await provider.generateText(text, 'deepseek-chat', {
-            functions: [
-                {
-                    name: 'get_weather',
-                    description: '获取指定地点的天气信息',
-                    parameters: { type: 'object', properties: { location: { type: 'string' } }, required: ['location'] },
+        const tools = [
+            {
+                type: "function",
+                function: {
+                    name: "get_weather",
+                    description: "获取指定地点的天气信息",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            location: { type: "string" },
+                            unit: { type: "string", enum: ["c", "f"] },
+                        },
+                        required: ["location", "unit"],
+                        additionalProperties: false,
+                    },
                 },
-                {
-                    name: 'set_reminder',
-                    description: '设置提醒',
-                    parameters: { type: 'object', properties: { dateTime: { type: 'string' }, message: { type: 'string' } }, required: ['dateTime', 'message'] },
+            },
+            {
+                type: "function",
+                function: {
+                    name: "get_stock_price",
+                    description: "获取指定股票的价格",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            symbol: { type: "string" },
+                        },
+                        required: ["symbol"],
+                        additionalProperties: false,
+                    },
                 },
-                // ... 其他 function 定义
-            ],
-            function_call: 'auto',
-        });
+            },
+        ];
 
+        // 2. 调用 AI 模型进行意图识别和参数提取 (使用 Function Calling 或其他方法)
+        const response = await provider.generateText(text, model, { tools });
         const telegramService = c.get('telegramService');
 
-        if (response) {
-            await telegramService.sendMessage(chatId, response);
+        if (response.type === 'tool_calls') {
+            const { name, arguments: args } = response.content;
+
+            const taskHandler = getTaskHandler(name);
+            if (taskHandler) {
+                await taskHandler(c, args);
+            } else {
+                console.warn(`No task handler registered for intent: ${name}`);
+                await telegramService.sendMessage(chatId, "我不确定如何处理您的请求。");
+            }
         } else {
-            console.warn('未收到 AI 的聊天回复:', response);
-            await telegramService.sendMessage(chatId, "抱歉，我没有理解您的意思。");
+            if (response.content) {
+                await telegramService.sendMessage(chatId, response.content);
+            } else {
+                console.warn('未收到 AI 的聊天回复:', response);
+                await telegramService.sendMessage(chatId, "抱歉，我没有理解您的意思。");
+            }
         }
-
-        // if (response?.function_call) {
-        //     const intent = response.function_call.name;
-        //     const params = JSON.parse(response.function_call.arguments || '{}');
-
-        //     const taskHandler = getTaskHandler(intent);
-        //     if (taskHandler) {
-        //         await taskHandler(c, params);
-        //     } else {
-        //         console.warn(`No task handler registered for intent: ${intent}`);
-        //         await telegramService.sendMessage(chatId, "我不确定如何处理您的请求。");
-        //     }
-        // } else {
-        //     // 如果没有 function_call，则认为是闲聊
-        //         // const chatResponse = response.choices[0]?.message?.content;
-        //     if (response) {
-        //         await telegramService.sendMessage(chatId, response);
-        //     } else {
-        //         console.warn('未收到 AI 的聊天回复:', response);
-        //         await telegramService.sendMessage(chatId, "抱歉，我没有理解您的意思。");
-        //     }
-        // }
     }
 }

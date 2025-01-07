@@ -104,7 +104,7 @@ export class AIModule {
         ];
 
         // 从 KV 获取用户上下文
-        let chatContext = userState.chatContext;
+        let chatContext = userState.chatContext || [];
         
         // 如果是新对话，添加系统 prompt
         if (chatContext.length === 0) {
@@ -122,22 +122,32 @@ export class AIModule {
 
         // 2. 调用 AI 模型进行意图识别和参数提取 (使用 Function Calling 或其他方法)
         const response = await provider.generateText(chatContext, 'deepseek-chat', { tools });
+        
         const telegramService = c.get('telegramService');
-
         if (response.type === 'tool_calls') {
             const { name, arguments: args } = response.content;
-            console.log('Tool call:', name, args);
+
+            const toolCalls = [{
+                id: response.tool_call_id,
+                type: 'function',
+                function: {
+                    name: response.content.name,
+                    arguments: JSON.stringify(response.content.arguments), // 确保 arguments 是字符串
+                },
+            }];
+
+            chatContext.push({ role: 'assistant', tool_calls: toolCalls, content: null });
             const taskRegistry = c.get('taskRegistry');
             const task = taskRegistry.getTask(name);
             if (task) {
                 const result = await task.handler(c, args);
-                chatContext.push({ role: 'tool', content: result, tool_call_id: response.tool_call_id });
+                chatContext.push({ role: 'tool', content: JSON.stringify(result), tool_call_id: response.tool_call_id });
                 await userStateService.updateState(chatId, { chatContext: chatContext });
                 // 把工具调用结果推入上下文，并发给ai模型
                 const finalResponse = await provider.generateText(chatContext, 'deepseek-chat');
                 if (finalResponse.type === 'text') {
                     chatContext.push({ role: 'assistant', content: finalResponse.content });
-                    await userStateService.updateState(chatId, { chatContext: chatContext });
+                    await userStateService.clearStateProperty(chatId, 'chatContext');
                     await telegramService.sendMessage(chatId, finalResponse.content);
                 } else {
                     console.warn('未收到 AI 的聊天回复:', finalResponse);

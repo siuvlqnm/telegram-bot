@@ -3,31 +3,30 @@ import { Context } from 'hono';
 import { AccuWeatherService } from '@/services/accuweather';
 
 export const getWeatherAction = async (c: Context, params: Record<string, any>) => {
-    const chatId = c.get('telegramUpdate').message?.chat.id;
-    const telegramService = c.get('telegramService');
     try {
         const weatherService = new AccuWeatherService(c);
     
         // 搜索位置
         const location = await weatherService.searchLocationByGeo('28.16700989590093,113.0403113939968');
         if (!location) {
-            await telegramService.sendMessage(chatId, '未找到该城市，请检查城市名称是否正确。');
-          return;
+            throw new Error('未找到该城市，请检查城市名称是否正确。');
         }
         
         // 获取当前天气
         const conditions = await weatherService.getCurrentConditions(location.Key);
         if (!conditions) {
-          await telegramService.sendMessage(chatId, '获取天气信息失败，请稍后重试。');
-          return;
+            throw new Error('获取天气信息失败，请稍后重试。');
         }
     
-        const currentWeather = weatherService.formatCurrentWeather(location, conditions);
-        await telegramService.sendMessage(chatId, currentWeather);
-      } catch (error) {
+        return {
+            location,
+            conditions,
+            formatted: weatherService.formatCurrentWeather(location, conditions)
+        };
+    } catch (error) {
         console.error('Weather command error:', error);
-        await telegramService.sendMessage(chatId, '获取天气信息时发生错误，请稍后重试。');
-      }
+        throw error;
+    }
 };
 
 // const getWeather: TaskHandler = async (c: Context, params: Record<string, any>) => {

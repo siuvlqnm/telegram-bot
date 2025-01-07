@@ -24,6 +24,17 @@ bot.use(async (c: Context, next: Next) => {
     return next();
 });
 
+// bot.post('/air', async (c: Context) => {
+//   const taskRegistry = c.get('taskRegistry');
+//   const task = taskRegistry.getTask('get_air_quality');
+//     if (task) {
+//         const response = await task.handler(c, {});
+//         console.log(response);
+//         // return c.json(response);
+//     }
+//     return c.text('🚫 air');
+// });
+
 // 处理 Telegram Webhook
 bot.post('/', async (c: Context) => {
   const update = c.get('telegramUpdate');

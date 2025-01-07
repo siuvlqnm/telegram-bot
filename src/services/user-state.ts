@@ -33,4 +33,11 @@ export class UserStateService {
   async clearState(chatId: number): Promise<void> {
     await this.kv.delete(`user-state:${chatId}`);
   }
+
+  // 清楚某个状态属性
+  async clearStateProperty(chatId: number, property: string): Promise<void> {
+    const currentState = await this.getState(chatId) || {};
+    const newState = { ...currentState, [property]: undefined };
+    await this.setState(chatId, newState);
+  }
 }

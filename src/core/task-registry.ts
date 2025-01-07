@@ -4,7 +4,7 @@ import { Context } from 'hono';
 export interface Task {
   name: string;
   description: string;
-  handler: (c: Context, params: Record<string, any>) => Promise<Response> | Response;
+  handler: (c: Context, params: Record<string, any>) => Promise<any> | any;
 }
 
 export class TaskRegistry {

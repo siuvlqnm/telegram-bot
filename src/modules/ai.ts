@@ -2,7 +2,7 @@
 import { Context } from 'hono';
 import { AIProvider } from '@/services/ai/ai-provider';
 import { DeepSeekProvider } from '@/services/ai/deepseek';
-import { getTaskHandler } from '@/core/task-registry';
+import { TaskRegistry } from '@/core/task-registry';
 
 export class AIModule {
     private providers: Map<string, AIProvider> = new Map();
@@ -71,6 +71,22 @@ export class AIModule {
                     },
                 },
             },
+            // 查询空气质量状况
+            {
+                type: "function",
+                function: {
+                    name: "get_air_quality",
+                    description: "获取指定地点的空气质量状况",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            location: { type: "string" },
+                        },
+                        required: ["location"],
+                        additionalProperties: false,
+                    },
+                },
+            },
             {
                 type: "function",
                 function: {
@@ -94,10 +110,10 @@ export class AIModule {
 
         if (response.type === 'tool_calls') {
             const { name, arguments: args } = response.content;
-
-            const taskHandler = getTaskHandler(name);
-            if (taskHandler) {
-                await taskHandler(c, args);
+            const taskRegistry = new TaskRegistry();
+            const task = taskRegistry.getTask(name);
+            if (task) {
+              return task.handler(c, args);
             } else {
                 console.warn(`No task handler registered for intent: ${name}`);
                 await telegramService.sendMessage(chatId, "我不确定如何处理您的请求。");

@@ -1,23 +1,25 @@
 import { Hono, Context } from 'hono';
-// import { logger } from 'hono/logger';
 import * as CommandLoader from '@/core/commands';
+import * as ActionLoader from '@/modules/actions';
 import { Bindings } from '@/bindings';
 import { globalAssigner } from '@/core/middlewares/assigner';
 import { validateTelegramUpdate } from '@/core/middlewares/validator';
 import { CommandRegistry } from '@/core/command-registry';
 import { handleCallbackQuery } from '@/core/callback-router';
 import { logger } from '@/core/middlewares/logger';
+import { TaskRegistry } from '@/core/task-registry';
+
 const bot = new Hono<{ Bindings: Bindings }>();
 const commandRegistry = new CommandRegistry();
-// bot.use(logger());
+const taskRegistry = new TaskRegistry();
+
 // 全局中间件
 bot.use(logger);
-
 bot.use(validateTelegramUpdate);
 bot.use(globalAssigner);
 // 注册所有命令
 CommandLoader.registerCommands(commandRegistry);
-
+ActionLoader.registerActions(taskRegistry);
 // 处理 Telegram Webhook
 bot.post('/', async (c: Context) => {
   const update = c.get('telegramUpdate');
@@ -47,7 +49,7 @@ bot.post('/', async (c: Context) => {
         const commandName = text.substring(1).split(' ')[0];
         const command = commandRegistry.getCommand(commandName);
         if (command) {
-          await userStateService.updateState(chatId, { currentIntent: commandName }); // 记录当前意图
+          // await userStateService.updateState(chatId, { currentIntent: commandName }); // 记录当前意图
           return command.handler(c);
         } else {
           await telegramService.sendMessage(chatId, '🚫 未知命令');

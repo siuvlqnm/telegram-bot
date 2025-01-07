@@ -2,7 +2,6 @@
 import { Context } from 'hono';
 import { AIProvider } from '@/services/ai/ai-provider';
 import { DeepSeekProvider } from '@/services/ai/deepseek';
-import { TaskRegistry } from '@/core/task-registry';
 
 export class AIModule {
     private providers: Map<string, AIProvider> = new Map();
@@ -48,7 +47,7 @@ export class AIModule {
         const userState = await userStateService.getState(chatId);
         const providerId = userState.preferredModelProvider;
         const model = userState.preferredModel;
-        const provider = this.getProvider(providerId);
+        const provider = this.getProvider('deepseek');
         if (!provider) {
             console.error(`Provider '${providerId}' not found.`);
             return;
@@ -105,12 +104,13 @@ export class AIModule {
         ];
 
         // 2. 调用 AI 模型进行意图识别和参数提取 (使用 Function Calling 或其他方法)
-        const response = await provider.generateText(text, model, { tools });
+        const response = await provider.generateText(text, 'deepseek-chat', { tools });
         const telegramService = c.get('telegramService');
 
         if (response.type === 'tool_calls') {
             const { name, arguments: args } = response.content;
-            const taskRegistry = new TaskRegistry();
+            console.log('Tool call:', name, args);
+            const taskRegistry = c.get('taskRegistry');
             const task = taskRegistry.getTask(name);
             if (task) {
               return task.handler(c, args);
@@ -120,6 +120,7 @@ export class AIModule {
             }
         } else {
             if (response.content) {
+                console.log('AI 的聊天回复:', response.content);
                 await telegramService.sendMessage(chatId, response.content);
             } else {
                 console.warn('未收到 AI 的聊天回复:', response);

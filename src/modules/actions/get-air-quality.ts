@@ -5,7 +5,7 @@ import { getAirQuality, formatAirQualityMessage } from '@/services/air-matters';
 export const getAirQualityAction = async (c: Context, params: Record<string, any>) => {
     const chatId = c.get('telegramUpdate').message?.chat.id;
     const telegramService = c.get('telegramService');
-    const airQualityData = await getAirQuality();
+    const airQualityData = await getAirQuality(c);
     const message = formatAirQualityMessage(airQualityData);
     await telegramService.sendMessage(chatId, message);
 };

@@ -1,12 +1,13 @@
 import { AirQualityResponse, AirQualityLevel } from '@/types/air-matters';
 import axios from 'axios';
-import { AIR_MATTERS_API_KEY } from '@/config';
-export async function getAirQuality(): Promise<AirQualityResponse> {
+import { Context } from 'hono';
+export async function getAirQuality(c: Context): Promise<AirQualityResponse> {
+    const apiKey = c.env.AIR_MATTERS_API_KEY;
     // https://api.air-matters.app/current_air_condition?place_id=b5f0a667&lang=en&standard=aqi_us
     const url = `https://api.air-matters.app/current_air_condition?place_id=ab4c5e07&lang=zh-Hans&standard=aqi_us`;
     const response = await axios.get<AirQualityResponse>(url, {
         headers: {
-            'Authorization': AIR_MATTERS_API_KEY()
+            'Authorization': apiKey
         }
     });
     return response.data;

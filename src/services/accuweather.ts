@@ -1,12 +1,13 @@
 import { AccuWeatherCurrentConditions, AccuWeatherForecast, AccuWeatherLocation } from '@/types/accuweather';
 import axios from 'axios';
+import { Context } from 'hono';
 
 export class AccuWeatherService {
   private readonly apiKey: string;
   private readonly baseUrl = 'http://dataservice.accuweather.com';
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
+  constructor(c: Context) {
+    this.apiKey = c.env.ACCUWEATHER_API_KEY;
   }
 
   // locations/v1/cities/geoposition/search 通过经纬度搜索

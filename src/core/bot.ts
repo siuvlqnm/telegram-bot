@@ -1,4 +1,4 @@
-import { Hono, Context } from 'hono';
+import { Hono, Context, Next } from 'hono';
 import * as CommandLoader from '@/core/commands';
 import * as ActionLoader from '@/modules/actions';
 import { Bindings } from '@/bindings';
@@ -7,11 +7,9 @@ import { validateTelegramUpdate } from '@/core/middlewares/validator';
 import { CommandRegistry } from '@/core/command-registry';
 import { handleCallbackQuery } from '@/core/callback-router';
 import { logger } from '@/core/middlewares/logger';
-import { TaskRegistry } from '@/core/task-registry';
 
 const bot = new Hono<{ Bindings: Bindings }>();
 const commandRegistry = new CommandRegistry();
-const taskRegistry = new TaskRegistry();
 
 // 全局中间件
 bot.use(logger);
@@ -19,7 +17,13 @@ bot.use(validateTelegramUpdate);
 bot.use(globalAssigner);
 // 注册所有命令
 CommandLoader.registerCommands(commandRegistry);
-ActionLoader.registerActions(taskRegistry);
+
+bot.use(async (c: Context, next: Next) => {
+    const taskRegistry = c.get('taskRegistry');
+    ActionLoader.registerActions(taskRegistry);
+    return next();
+});
+
 // 处理 Telegram Webhook
 bot.post('/', async (c: Context) => {
   const update = c.get('telegramUpdate');

@@ -1,3 +1,40 @@
+interface Tool {
+    type: 'function';
+    function: {
+        name: string;
+        description: string;
+        parameters: {
+            type: 'object';
+            properties: { [key: string]: any };
+            required: string[];
+        };
+    };
+}
+
+// 定义消息接口
+export interface Message {
+    role: 'system' | 'user' | 'assistant' | 'tool';
+    content?: string;
+    name?: string;
+}
+
+// 定义模型响应选择接口
+interface ChatCompletionChoice {
+    message: {
+        content?: string;
+        tool_calls?: ToolCall[];
+    };
+}
+
+// 定义工具调用接口
+interface ToolCall {
+    id: string;
+    function: {
+        name: string;
+        arguments: string;
+    };
+}
+
 // 模型提供商类型
 export type AIProvider = {
     id: string;

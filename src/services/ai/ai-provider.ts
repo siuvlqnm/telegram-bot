@@ -10,6 +10,7 @@ export type AIResponse = {
         name: string;
         arguments: Record<string, any>;
     };
+    tool_call_id: string;
 };
 
 export interface AIProvider {
@@ -23,7 +24,7 @@ export interface AIProvider {
     listModels(): Promise<string[]>;
 
     // 生成文本
-    generateText(prompt: string, model: string, options?: any): Promise<AIResponse>;
+    generateText(messages: any[], model: string, options?: any): Promise<AIResponse>;
 
     // 其他可能需要的接口，例如：
     // generateImage(prompt: string, model: string, options?: any): Promise<string>;

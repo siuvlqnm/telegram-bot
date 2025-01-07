@@ -1,13 +1,16 @@
 // src/modules/actions/get-weather.ts
 import { Context } from 'hono';
-import { getAirQuality, formatAirQualityMessage } from '@/services/air-matters';
+import { getAirQuality } from '@/services/air-matters';
 
-export const getAirQualityAction = async (c: Context, params: Record<string, any>) => {
-    const chatId = c.get('telegramUpdate').message?.chat.id;
-    const telegramService = c.get('telegramService');
+// 返回原始数据
+export const getAirQualityAction = async (c: Context, params: Record<string, any>) =>  {
     const airQualityData = await getAirQuality(c);
-    const message = formatAirQualityMessage(airQualityData);
-    await telegramService.sendMessage(chatId, message);
+    return airQualityData;
+    // const chatId = c.get('telegramUpdate').message?.chat.id;
+    // const telegramService = c.get('telegramService');
+    // const airQualityData = await getAirQuality(c);
+    // const message = formatAirQualityMessage(airQualityData);
+    // await telegramService.sendMessage(chatId, message);
 };
 
 // const getAirQuality: TaskHandler = async (c: Context, params: Record<string, any>) => {

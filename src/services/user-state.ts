@@ -4,6 +4,7 @@ export interface UserState {
   // 其他状态属性
   preferredModelProvider?: string;
   preferredModel?: string;
+  chatContext?: any[];
   [key: string]: any;
 }
 

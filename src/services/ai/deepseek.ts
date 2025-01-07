@@ -1,7 +1,6 @@
 import { OpenAI } from 'openai';
 import { AIProvider, AIResponse } from './ai-provider';
 import { Context } from 'hono';
-
 // baseURL: https://api.deepseek.com
 
 export class DeepSeekProvider implements AIProvider {
@@ -25,7 +24,7 @@ export class DeepSeekProvider implements AIProvider {
         return models.data.map(model => model.id);
     }
 
-    async generateText(prompt: string, model: string, options?: OpenAI.Chat.ChatCompletionCreateParams): Promise<AIResponse> {
+    async generateText(messages: any[], model: string, options?: OpenAI.Chat.ChatCompletionCreateParams): Promise<AIResponse> {
         if (!this.deepseek) {
             throw new Error('DeepSeek client not initialized');
         }
@@ -33,8 +32,10 @@ export class DeepSeekProvider implements AIProvider {
         try {
             const completion = await this.deepseek.chat.completions.create({
                 model: model,
-                messages: [{ role: 'user', content: prompt }],
+                messages: messages,
                 stream: false,
+                max_tokens: 1024,
+                temperature: 0.7,
                 ...options,
             });
 
@@ -48,7 +49,8 @@ export class DeepSeekProvider implements AIProvider {
                         content: {
                             name: choice.message.tool_calls[0].function.name,
                             arguments: JSON.parse(choice.message.tool_calls[0].function.arguments || '{}')
-                        }
+                        },
+                        tool_call_id: choice.message.tool_calls[0].id
                     };
                 }
                 

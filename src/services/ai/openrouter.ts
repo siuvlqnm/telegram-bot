@@ -1,11 +1,10 @@
 import { OpenAI } from 'openai';
-import { DEEPSEEK_API_KEY } from '@/config';
 
 export async function getAiResponse(messages: any[], model: string) {
   try {
     const openai = new OpenAI({
       baseURL: "https://api.deepseek.com",
-      apiKey: DEEPSEEK_API_KEY(),
+      apiKey: '',
       // defaultHeaders: {
       //   "X-Title": "Telegram Bot", // Optional. Shows in rankings on openrouter.ai.
       // }

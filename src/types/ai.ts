@@ -7,6 +7,7 @@ interface Tool {
             type: 'object';
             properties: { [key: string]: any };
             required: string[];
+            additionalProperties?: boolean;
         };
     };
 }
@@ -52,6 +53,88 @@ export type AIModel = {
     name: string;
     description: string;
 };
+
+export const tools: Tool[] = [
+    {
+        type: "function",
+        function: {
+            name: "get_weather",
+            description: "获取指定长沙的天气信息",
+            parameters: {
+                type: "object",
+                properties: {
+                    location: { type: "string" },
+                    unit: { type: "string", enum: ["c", "f"] },
+                },
+                required: ["location", "unit"],
+                additionalProperties: false,
+            },
+        },
+    },
+    // 查询空气质量状况
+    {
+        type: "function",
+        function: {
+            name: "get_air_quality",
+            description: "获取指定长沙的空气质量状况",
+            parameters: {
+                type: "object",
+                properties: {
+                    location: { type: "string" },
+                },
+                required: ["location"],
+                additionalProperties: false,
+            },
+        },
+    },
+    // 查询列表
+    {
+        type: "function",
+        function: {
+            name: "create_list",
+            description: "创建一个新的列表",
+            parameters: {
+                type: "object",
+                properties: {
+                    name: { type: "string", description: "列表名称" },
+                    description: { type: "string", description: "列表描述（可选）" }
+                },
+                required: ["name"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "add_list_item",
+            description: "向列表添加一个项目",
+            parameters: {
+                type: "object",
+                properties: {
+                    list_id: { type: "number", description: "列表ID" },
+                    content: { type: "string", description: "项目内容" }
+                },
+                required: ["list_id", "content"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "add_list_tag",
+            description: "为列表添加标签",
+            parameters: {
+                type: "object",
+                properties: {
+                    list_id: { type: "number", description: "列表ID" },
+                    tag_name: { type: "string", description: "标签名称" }
+                },
+                required: ["list_id", "tag_name"]
+            }
+        }
+    }
+    
+]
 
 // 可用的 AI 提供商列表
 export const AI_PROVIDERS: Record<string, AIProvider> = {

@@ -1,12 +1,13 @@
 import { Context, Next, MiddlewareHandler } from 'hono';
+import { DateTime } from 'luxon';
 
 export const logger: MiddlewareHandler = async (c: Context, next: Next) => {
   // 时区为东八区
-  const timezoneOffset = 8 * 60 * 60 * 1000;
-  const startTime = Date.now() + timezoneOffset;
+  const now = DateTime.now().setZone('Asia/Shanghai');
+  const nowStr = now.toFormat('yyyy-MM-dd HH:mm:ss');
   
   // 记录请求开始
-  console.log(`[${new Date(startTime).toISOString()}] 👉 ${c.req.method} ${c.req.url}`);
+  console.log(`[${nowStr}] 👉 ${c.req.method} ${c.req.url}`);
   
   try {
     // 克隆请求以读取 body（因为 body 只能读取一次）
@@ -38,7 +39,7 @@ export const logger: MiddlewareHandler = async (c: Context, next: Next) => {
   await next();
 
   // 记录响应时间
-  const endTime = Date.now() + timezoneOffset;
-  const duration = endTime - startTime;
-  console.log(`[${new Date(startTime).toISOString()}] ✅ Completed in ${duration}ms`);
+  const endTime = DateTime.now().setZone('Asia/Shanghai');
+  const duration = endTime.diff(now).toMillis();
+  console.log(`[${nowStr}] ✅ Completed in ${duration}ms`);
 };

@@ -48,7 +48,7 @@ export class AIModule {
         const userState = await userStateService.getState(chatId);
         const providerId = userState.preferredModelProvider;
         const model = userState.preferredModel;
-        const provider = this.getProvider('deepseek');
+        const provider = this.getProvider(providerId);
         if (!provider) {
             console.error(`Provider '${providerId}' not found.`);
             return;
@@ -59,7 +59,7 @@ export class AIModule {
                 type: "function",
                 function: {
                     name: "get_weather",
-                    description: "获取指定长沙的天气信息",
+                    description: "获取长沙的天气信息",
                     parameters: {
                         type: "object",
                         properties: {
@@ -76,7 +76,7 @@ export class AIModule {
                 type: "function",
                 function: {
                     name: "get_air_quality",
-                    description: "获取指定长沙的空气质量状况",
+                    description: "获取长沙的空气质量状况",
                     parameters: {
                         type: "object",
                         properties: {
@@ -111,7 +111,7 @@ export class AIModule {
         }
 
         // 2. 调用 AI 模型进行意图识别和参数提取 (使用 Function Calling 或其他方法)
-        const response = await provider.generateText(chatContext, 'deepseek-chat', { tools });
+        const response = await provider.generateText(chatContext, model, { tools });
         
         const telegramService = c.get('telegramService');
         if (response.type === 'tool_calls') {

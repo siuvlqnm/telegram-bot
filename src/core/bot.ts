@@ -35,6 +35,8 @@ bot.use(async (c: Context, next: Next) => {
 //     return c.text('🚫 air');
 // });
 
+// 智能清单，智能待办，智能便签
+
 // 处理 Telegram Webhook
 bot.post('/', async (c: Context) => {
   const update = c.get('telegramUpdate');
